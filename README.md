@@ -12,13 +12,21 @@ A macOS desktop clipboard manager built for job search workflows — store text 
 
 Filling out job applications means pasting the same blocks of text dozens of times a day. SlotPaste keeps them one click away, organized the way you think, without leaving your flow.
 
-## Planned features
+## Features
 
+### Done
 - Tabs: create, rename, switch
 - Blocks: add, edit, delete, copy on click
-- Drag-and-drop sorting for blocks and tabs
-- Free canvas mode: position blocks freely, group them
+- Block resize (width + height)
+- Font size and per-block color in edit popup
+- Edit popup: flies out from block position, full-width overlay, confirm on unsaved changes
+- Free canvas: drag blocks to any position, persisted across sessions
+
+### Planned
+- Tab drag-and-drop sorting
 - Appearance panel: background and block color + opacity
+- List / canvas mode toggle per tab
+- Block grouping on canvas
 - Tray icon + global shortcut (⌘⇧V) to show/hide
 - Frameless window with native macOS traffic lights
 - `.dmg` build
