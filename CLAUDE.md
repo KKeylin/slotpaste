@@ -124,10 +124,9 @@ window:hide     → скрывает окно (для глобального sho
 ## Dev commands
 
 ```bash
-npm run dev        # Vite dev server + Electron
-npm run build      # TypeScript build
-npm run dist       # electron-builder → .dmg
-npm run lint       # ESLint + TypeScript check
+pnpm dev        # Vite dev server + Electron
+pnpm build      # TypeScript build + electron-builder
+pnpm lint       # ESLint + TypeScript check
 ```
 
 ## Setup (новый проект)
@@ -135,10 +134,10 @@ npm run lint       # ESLint + TypeScript check
 ```bash
 npm create electron-vite@latest slotpaste -- --template react-ts
 cd slotpaste
-npm install
-npm install electron-store @dnd-kit/core @dnd-kit/sortable framer-motion
-npm install -D electron-builder tailwindcss autoprefixer
-npx tailwindcss init
+pnpm install
+pnpm add electron-store @dnd-kit/core @dnd-kit/sortable framer-motion
+pnpm add -D electron-builder tailwindcss autoprefixer
+pnpm dlx tailwindcss init
 ```
 
 ## Key implementation notes

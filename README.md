@@ -36,10 +36,9 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 ## Dev commands
 
 ```bash
-npm run dev      # Vite dev server + Electron
-npm run build    # TypeScript build
-npm run dist     # electron-builder → .dmg
-npm run lint     # ESLint + TypeScript check
+pnpm dev      # Vite dev server + Electron
+pnpm build    # TypeScript build + electron-builder
+pnpm lint     # ESLint + TypeScript check
 ```
 
 ## License
