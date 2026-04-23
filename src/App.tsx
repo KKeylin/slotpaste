@@ -26,6 +26,10 @@ export default function App() {
     })
   }
 
+  function reorderTabs(tabs: Tab[]) {
+    patchState({ tabs })
+  }
+
   function addTab() {
     const id = nanoid()
     const newTab: Tab = { id, name: 'New tab', blocks: [], viewMode: 'list' }
@@ -78,6 +82,7 @@ export default function App() {
         onSelect={(id) => patchState({ activeTabId: id })}
         onAdd={addTab}
         onRename={renameTab}
+        onReorder={reorderTabs}
       />
 
       <BlockList

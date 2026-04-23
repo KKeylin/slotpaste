@@ -2,7 +2,7 @@
 
 A macOS desktop clipboard manager built for job search workflows — store text snippets (cover letters, skills, links), copy on click, organize in tabs.
 
-> **Status**: In development. Not yet functional.
+> **Status**: In development. Core features working — not yet packaged for distribution.
 
 ---
 
@@ -21,9 +21,9 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 - Font size and per-block color in edit popup
 - Edit popup: flies out from block position, full-width overlay, confirm on unsaved changes
 - Free canvas: drag blocks to any position, persisted across sessions
+- Tab drag-and-drop sorting
 
 ### Planned
-- Tab drag-and-drop sorting
 - Appearance panel: background and block color + opacity
 - List / canvas mode toggle per tab
 - Block grouping on canvas
