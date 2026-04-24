@@ -8,6 +8,8 @@ declare global {
       getState: () => Promise<AppState>
       setState: (state: AppState) => Promise<void>
       copyText: (text: string) => Promise<void>
+      getAutoLaunch: () => Promise<boolean>
+      setAutoLaunch: (enabled: boolean) => Promise<void>
     }
   }
 }

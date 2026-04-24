@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, clipboard } from 'electron'
+import { app, BrowserWindow, ipcMain, clipboard, Tray, Menu, globalShortcut, nativeImage } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getState, setState, getWindowBounds, saveWindowBounds } from './store.js'
@@ -16,6 +16,32 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   : RENDERER_DIST
 
 let win: BrowserWindow | null
+let tray: Tray | null
+
+function toggleWindow() {
+  if (!win) return
+  if (win.isVisible()) {
+    win.hide()
+  } else {
+    win.show()
+    win.focus()
+  }
+}
+
+function createTray() {
+  const iconPath = path.join(process.env.VITE_PUBLIC!, 'tray-iconTemplate.png')
+  const icon = nativeImage.createFromPath(iconPath)
+  tray = new Tray(icon)
+  tray.setToolTip('SlotPaste')
+
+  const menu = Menu.buildFromTemplate([
+    { label: 'Show / Hide', click: toggleWindow },
+    { type: 'separator' },
+    { label: 'Quit', click: () => app.quit() },
+  ])
+  tray.setContextMenu(menu)
+  tray.on('click', toggleWindow)
+}
 
 function createWindow() {
   const bounds = getWindowBounds()
@@ -32,6 +58,12 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.mjs'),
       contextIsolation: true,
     },
+  })
+
+  // закрытие через ⌘W скрывает окно, не завершает процесс
+  win.on('close', (e) => {
+    e.preventDefault()
+    win?.hide()
   })
 
   let resizeTimer: ReturnType<typeof setTimeout> | null = null
@@ -54,18 +86,30 @@ function createWindow() {
 ipcMain.handle('store:get', () => getState())
 ipcMain.handle('store:set', (_event, state) => setState(state))
 ipcMain.handle('clipboard:write', (_event, text: string) => clipboard.writeText(text))
+ipcMain.handle('autolaunch:get', () => app.getLoginItemSettings().openAtLogin)
+ipcMain.handle('autolaunch:set', (_event, enabled: boolean) => {
+  app.setLoginItemSettings({ openAtLogin: enabled })
+})
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-    win = null
-  }
+  if (process.platform !== 'darwin') app.quit()
 })
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+  if (win) {
+    win.show()
+    win.focus()
+  } else {
     createWindow()
   }
 })
 
-app.whenReady().then(createWindow)
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll()
+})
+
+app.whenReady().then(() => {
+  createWindow()
+  createTray()
+  globalShortcut.register('CommandOrControl+Shift+V', toggleWindow)
+})
