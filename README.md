@@ -29,6 +29,9 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 - Color picker in AddBlock (swatches + color wheel, above the input)
 - Appearance panel: background and block color + opacity
 - Tab drag-and-drop sorting
+- SF Pro system font (no external import)
+- Collision detection: blocks never overlap — R-tree spatial index (rbush) + aggregate MTV resolution; snap animation on drag/resize; ResizeObserver for accurate real-time bounding boxes
+- Scale-aware resize: cursor and block edge stay in sync at any zoom level
 
 ### Planned
 - List / canvas mode toggle per tab
@@ -46,6 +49,7 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 - **@dnd-kit** — drag-and-drop
 - **framer-motion** — animations
 - **Tailwind CSS** — styling
+- **rbush** — R-tree spatial index for collision detection
 
 ## Dev commands
 

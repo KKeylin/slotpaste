@@ -17,21 +17,24 @@ const fontSizeClasses: Record<FontSize, string> = {
 interface Props {
   block: BlockType
   appearance: Appearance
+  scale?: number
   onCopy: (text: string) => void
   onChange: (block: BlockType) => void
   onColorChange: (block: BlockType, recentColors: string[]) => void
   onDelete: (id: string) => void
+  onResizeEnd?: (block: BlockType) => void
   dragHandleProps?: React.HTMLAttributes<HTMLDivElement>
   onWiggleChange?: (wiggling: boolean) => void
 }
 
-export default function Block({ block, appearance, onCopy, onChange, onColorChange, onDelete, dragHandleProps, onWiggleChange }: Props) {
+export default function Block({ block, appearance, scale = 1, onCopy, onChange, onColorChange, onDelete, onResizeEnd, dragHandleProps, onWiggleChange }: Props) {
   const [editOpen, setEditOpen] = useState(false)
   const [savedBlock, setSavedBlock] = useState<BlockType | null>(null)
   const [blockRect, setBlockRect] = useState<DOMRect | null>(null)
   const [wiggling, setWiggling] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
   const resizeStart = useRef<{ x: number; y: number; w: number; h: number } | null>(null)
   const justResized = useRef(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -98,14 +101,16 @@ export default function Block({ block, appearance, onCopy, onChange, onColorChan
   function handleResizeMouseDown(e: React.MouseEvent) {
     e.stopPropagation()
     e.preventDefault()
-    const rect = containerRef.current!.getBoundingClientRect()
-    resizeStart.current = { x: e.clientX, y: e.clientY, w: rect.width, h: rect.height }
+    const rect = innerRef.current!.getBoundingClientRect()
+    resizeStart.current = { x: e.clientX, y: e.clientY, w: rect.width / scale, h: rect.height / scale }
+    let finalW = Math.round(rect.width / scale)
+    let finalH = Math.round(rect.height / scale)
 
     function onMove(ev: MouseEvent) {
       if (!resizeStart.current) return
-      const newW = Math.max(120, resizeStart.current.w + (ev.clientX - resizeStart.current.x))
-      const newH = Math.max(40, resizeStart.current.h + (ev.clientY - resizeStart.current.y))
-      onChange({ ...block, width: Math.round(newW), height: Math.round(newH) })
+      finalW = Math.max(120, Math.round(resizeStart.current.w + (ev.clientX - resizeStart.current.x) / scale))
+      finalH = Math.max(40, Math.round(resizeStart.current.h + (ev.clientY - resizeStart.current.y) / scale))
+      onChange({ ...block, width: finalW, height: finalH })
     }
     function onUp() {
       resizeStart.current = null
@@ -113,6 +118,7 @@ export default function Block({ block, appearance, onCopy, onChange, onColorChan
       setTimeout(() => { justResized.current = false }, 100)
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseup', onUp)
+      onResizeEnd?.({ ...block, width: finalW, height: finalH })
     }
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseup', onUp)
@@ -163,6 +169,7 @@ export default function Block({ block, appearance, onCopy, onChange, onColorChan
         >
           {/* block */}
           <div
+            ref={innerRef}
             className="relative rounded-2xl px-5 pt-5 pb-4 cursor-pointer select-none"
             style={{
               backgroundColor: bgColor,

@@ -15,11 +15,13 @@
     "@dnd-kit/utilities": "^3.2.2",
     "electron-store": "^11.0.2",
     "framer-motion": "^12.38.0",
+    "rbush": "^4.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.4",
+    "@types/rbush": "^4.0.0",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^7.1.1",

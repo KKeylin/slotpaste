@@ -15,7 +15,7 @@ export interface Tab {
   id: string
   name: string
   blocks: Block[]
-  viewMode: 'list' | 'canvas'
+  viewMode: 'list' | 'canvas'На
 }
 
 export interface Appearance {

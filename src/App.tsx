@@ -8,6 +8,7 @@ import Toast from './components/Toast'
 import SettingsPanel from './components/SettingsPanel'
 import type { AppState, Block, Tab } from './types'
 import { nanoid } from './utils/nanoid'
+import { findFreePosition, BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from './utils/collision'
 
 export default function App() {
   const { state, updateState, ready } = useStore()
@@ -53,9 +54,10 @@ export default function App() {
   function addBlock(text: string, color?: string) {
     const last = activeTab.blocks[activeTab.blocks.length - 1]
     const i = activeTab.blocks.length
-    const position = last
+    const desired = last
       ? { x: last.position?.x ?? 5000, y: (last.position?.y ?? 5000 + (i - 1) * 90) + (last.height ?? 90) + 20 }
       : { x: 5000, y: 5000 }
+    const position = findFreePosition(desired, { w: BLOCK_DEFAULT_W, h: BLOCK_DEFAULT_H + EDIT_OVERHANG }, activeTab.blocks)
     const block: Block = { id: nanoid(), text, fontSize: 'md', position, ...(color ? { color } : {}) }
     patchTab(activeTab.id, { blocks: [...activeTab.blocks, block] })
   }
