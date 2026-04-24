@@ -2,6 +2,12 @@
 
 import type { AppState } from './types/index.js'
 
+declare module 'react' {
+  interface CSSProperties {
+    WebkitAppRegion?: 'drag' | 'no-drag'
+  }
+}
+
 declare global {
   interface Window {
     electronAPI: {

@@ -103,7 +103,7 @@ export default function App() {
         backgroundColor: `color-mix(in srgb, ${state.appearance.bgColor} ${state.appearance.bgOpacity * 100}%, transparent)`,
       }}
     >
-      <div className="relative">
+      <div className="relative" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
         <TabBar
           tabs={state.tabs}
           activeTabId={state.activeTabId}
@@ -117,6 +117,7 @@ export default function App() {
           onClick={() => setSettingsOpen((v) => !v)}
           className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center transition-opacity hover:opacity-75"
           style={{
+            WebkitAppRegion: 'no-drag',
             borderBottomLeftRadius: '12px',
             backgroundColor: isColorDark(state.appearance.bgColor)
               ? 'rgba(255,255,255,0.88)'
