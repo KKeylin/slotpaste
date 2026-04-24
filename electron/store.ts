@@ -1,6 +1,11 @@
 import Store from 'electron-store'
 import type { AppState } from '../src/types/index.js'
 
+interface StoreSchema {
+  appState: AppState
+  windowBounds: { width: number; height: number }
+}
+
 const defaultState: AppState = {
   tabs: [
     {
@@ -20,8 +25,13 @@ const defaultState: AppState = {
   },
 }
 
-const store = new Store<{ appState: AppState }>({
-  defaults: { appState: defaultState },
+const DEFAULT_BOUNDS = { width: 800, height: 600 }
+
+const store = new Store<StoreSchema>({
+  defaults: {
+    appState: defaultState,
+    windowBounds: DEFAULT_BOUNDS,
+  },
 })
 
 export function getState(): AppState {
@@ -30,4 +40,12 @@ export function getState(): AppState {
 
 export function setState(state: AppState): void {
   store.set('appState', state)
+}
+
+export function getWindowBounds(): { width: number; height: number } {
+  return store.get('windowBounds')
+}
+
+export function saveWindowBounds(bounds: { width: number; height: number }): void {
+  store.set('windowBounds', bounds)
 }

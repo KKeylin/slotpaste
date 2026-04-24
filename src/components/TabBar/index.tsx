@@ -163,7 +163,7 @@ export default function TabBar({ tabs, activeTabId, onSelect, onAdd, onRename, o
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <SortableContext items={tabs.map((t) => t.id)} strategy={horizontalListSortingStrategy}>
           <div
-            className="flex items-center gap-1 px-3 pt-3 pb-2 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+            className="flex items-center gap-1 pr-3 pl-20 pt-3 pb-2 overflow-x-auto [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none' }}
             onClick={() => setWigglingId(null)}
           >

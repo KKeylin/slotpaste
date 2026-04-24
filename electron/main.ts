@@ -1,7 +1,8 @@
 import { app, BrowserWindow, ipcMain, clipboard } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { getState, setState } from './store.js'
+import { getState, setState, getWindowBounds, saveWindowBounds } from './store.js'
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 process.env.APP_ROOT = path.join(__dirname, '..')
@@ -17,13 +18,30 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win: BrowserWindow | null
 
 function createWindow() {
+  const bounds = getWindowBounds()
+
   win = new BrowserWindow({
-    width: 380,
-    height: 600,
+    width: bounds.width,
+    height: bounds.height,
+    minWidth: 400,
+    minHeight: 400,
+    titleBarStyle: 'hiddenInset',
+    transparent: true,
+    vibrancy: 'under-window',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       contextIsolation: true,
     },
+  })
+
+  let resizeTimer: ReturnType<typeof setTimeout> | null = null
+  win.on('resize', () => {
+    if (resizeTimer) clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(() => {
+      if (!win) return
+      const [width, height] = win.getSize()
+      saveWindowBounds({ width, height })
+    }, 500)
   })
 
   if (VITE_DEV_SERVER_URL) {
