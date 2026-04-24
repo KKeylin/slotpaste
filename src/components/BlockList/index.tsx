@@ -39,6 +39,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
               height: CANVAS_SIZE,
               transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
               transformOrigin: '0 0',
+              willChange: 'transform',
             }}
             {...pointerHandlers}
           >

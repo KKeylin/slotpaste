@@ -15,10 +15,8 @@ const defaultState: AppState = {
   },
 }
 
-const isBrowser = !window.electronAPI
-
-async function loadState(): Promise<AppState> {
-  if (isBrowser) {
+function loadState(): AppState {
+  try {
     const raw = localStorage.getItem(LS_KEY)
     if (!raw) return defaultState
     const saved = JSON.parse(raw) as AppState
@@ -27,32 +25,28 @@ async function loadState(): Promise<AppState> {
       ...saved,
       appearance: { ...defaultState.appearance, ...saved.appearance },
     }
+  } catch {
+    return defaultState
   }
-  return window.electronAPI.getState()
 }
 
-async function saveState(state: AppState): Promise<void> {
-  if (isBrowser) {
-    localStorage.setItem(LS_KEY, JSON.stringify(state))
-    return
-  }
-  return window.electronAPI.setState(state)
-}
+let saveTimer: ReturnType<typeof setTimeout> | null = null
 
 export function useStore() {
   const [state, setState] = useState<AppState>(defaultState)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    loadState().then((saved) => {
-      setState(saved)
-      setReady(true)
-    })
+    setState(loadState())
+    setReady(true)
   }, [])
 
   const updateState = useCallback((next: AppState) => {
     setState(next)
-    saveState(next)
+    if (saveTimer) clearTimeout(saveTimer)
+    saveTimer = setTimeout(() => {
+      localStorage.setItem(LS_KEY, JSON.stringify(next))
+    }, 400)
   }, [])
 
   return { state, updateState, ready }
