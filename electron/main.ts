@@ -95,15 +95,6 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('activate', () => {
-  if (win) {
-    win.show()
-    win.focus()
-  } else {
-    createWindow()
-  }
-})
-
 app.on('will-quit', () => {
   globalShortcut.unregisterAll()
 })
@@ -112,4 +103,13 @@ app.whenReady().then(() => {
   createWindow()
   createTray()
   globalShortcut.register('CommandOrControl+Shift+V', toggleWindow)
+
+  app.on('activate', () => {
+    if (win) {
+      win.show()
+      win.focus()
+    } else {
+      createWindow()
+    }
+  })
 })
