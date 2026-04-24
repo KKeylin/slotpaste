@@ -113,13 +113,24 @@ export default function SettingsPanel({ isOpen, appearance, onChange, onClose }:
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
 
-          <div className="flex flex-col gap-1">
-            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
-              SlotPaste v{VERSION}
-            </span>
-            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.18)' }}>
-              Kostiantyn Keilin · MIT License
-            </span>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
+              <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                SlotPaste v{VERSION}
+              </span>
+              <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.18)' }}>
+                Kostiantyn Keilin · MIT License
+              </span>
+            </div>
+            <a
+              href="https://buymeacoffee.com/kkeylin"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-opacity hover:opacity-80"
+              style={{ backgroundColor: '#FFDD00', color: '#000' }}
+            >
+              ☕ Buy me a coffee
+            </a>
           </div>
         </motion.div>
       )}
