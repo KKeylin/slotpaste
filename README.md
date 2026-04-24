@@ -33,7 +33,7 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 - Vertical scrollable list with drag-to-reorder
 
 **Appearance**
-- Background and block color + opacity
+- Background color, block color + opacity, accent color (borders, icons)
 
 ## Tech stack
 

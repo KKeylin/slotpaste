@@ -8,9 +8,9 @@ const defaultState: AppState = {
   activeTabId: 'default',
   appearance: {
     bgColor: '#0e0e0e',
-    bgOpacity: 0.8,
     blockColor: '#1a1a1a',
     blockOpacity: 1,
+    accentColor: '#333333',
     recentColors: [],
   },
 }

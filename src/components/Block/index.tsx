@@ -56,7 +56,7 @@ export default function Block({ block, appearance, scale = 1, onCopy, onChange, 
             style={{
               backgroundColor: bgColor,
               color: textColor,
-              border: '1px solid rgba(255,255,255,0.08)',
+              border: `1px solid ${appearance.accentColor}`,
               height: block.height ? block.height + 'px' : undefined,
               overflow: 'hidden',
             }}

@@ -20,9 +20,9 @@ export interface Tab {
 
 export interface Appearance {
   bgColor: string
-  bgOpacity: number
   blockColor: string
   blockOpacity: number
+  accentColor: string
   recentColors: string[]
 }
 
