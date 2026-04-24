@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import colorWheelImg from '../assets/color-wheel-2.png'
 import type { Block, FontSize, Appearance } from '../types'
 import { isColorDark } from '../utils/color'
+import ColorSwatches from './ColorSwatches'
 
 const fontSizeClasses: Record<FontSize, string> = {
   h1: 'text-2xl font-medium',
@@ -224,28 +224,16 @@ export default function EditPopup({
 
               <div className="w-px h-4 opacity-20" style={{ backgroundColor: textColor }} />
 
-              {appearance.recentColors.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => applyColor(c)}
-                  className="w-6 h-6 rounded-full border-2 transition-opacity hover:opacity-80"
-                  style={{
-                    backgroundColor: c,
-                    borderColor: block.color === c ? textColor : 'transparent',
-                  }}
-                />
-              ))}
-
-              <label className="w-6 h-6 rounded-full cursor-pointer hover:opacity-80 relative overflow-hidden">
-                <img src={colorWheelImg} className="w-full h-full object-cover rounded-full" alt="color wheel" />
-                <input
-                  type="color"
-                  value={block.color ?? appearance.blockColor}
-                  onChange={(e) => onChange({ ...block, color: e.target.value })}
-                  onBlur={(e) => applyColor(e.target.value)}
-                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                />
-              </label>
+              <ColorSwatches
+                colors={appearance.recentColors}
+                selectedColor={block.color}
+                size="md"
+                accentColor={textColor}
+                wheelValue={block.color ?? appearance.blockColor}
+                onSelect={applyColor}
+                onWheelChange={(c) => onChange({ ...block, color: c })}
+                onWheelBlur={applyColor}
+              />
 
               <div className="w-px h-4 opacity-20" style={{ backgroundColor: textColor }} />
 
