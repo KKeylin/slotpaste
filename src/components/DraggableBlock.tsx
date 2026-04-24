@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useDraggable } from '@dnd-kit/core'
 import { motion } from 'framer-motion'
 import Block from './Block'
@@ -15,8 +16,11 @@ interface Props {
 }
 
 export default function DraggableBlock({ block, position, scale = 1, ...rest }: Props) {
+  const [wiggling, setWiggling] = useState(false)
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: block.id,
+    disabled: wiggling,
   })
 
   const tx = transform ? transform.x / scale : 0
@@ -57,7 +61,12 @@ export default function DraggableBlock({ block, position, scale = 1, ...rest }: 
         transition={{ type: 'spring', stiffness: 360, damping: 26 }}
         style={{ position: 'relative', zIndex: 1 }}
       >
-        <Block {...rest} block={block} dragHandleProps={{ ...attributes, ...listeners }} />
+        <Block
+          {...rest}
+          block={block}
+          dragHandleProps={{ ...attributes, ...listeners }}
+          onWiggleChange={setWiggling}
+        />
       </motion.div>
     </div>
   )

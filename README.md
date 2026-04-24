@@ -17,7 +17,7 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 ### Done
 - Tabs: create, rename (double-click), switch, reorder (drag), delete (long press → confirm)
 - New tab auto-focuses the name input on creation
-- Blocks: add, edit, delete, copy on click
+- Blocks: add, edit, delete (long press → wiggle → confirm), copy on click
 - Block resize (width + height)
 - Font size and per-block color in edit popup
 - Edit popup: flies out from block position, full-width overlay, confirm on unsaved changes
