@@ -1,8 +1,6 @@
 # SlotPaste
 
-A macOS clipboard manager built for job search workflows — store text snippets, copy on click, organize in tabs.
-
-<!-- TODO: screenshot or demo gif -->
+A web clipboard manager built for job search workflows — store text snippets, copy on click, organize in tabs.
 
 ---
 
@@ -15,13 +13,13 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 **Tabs**
 - Create, rename (double-click), switch, reorder (drag), delete (long press → confirm)
 - Auto-focuses name input on creation
-- List or canvas mode per tab, persisted across restarts
 
 **Blocks**
 - Add, copy on click, delete (long press → wiggle → confirm)
-- Edit popup: font size, per-block color, delete — flies out from block position
+- Edit popup: font size, per-block color, delete
 - Resize (width + height) via drag handle
 - Color picker: swatches + color wheel
+- List or canvas mode per tab, persisted across sessions
 
 **Free Canvas**
 - 10 000 × 10 000 canvas — drag blocks freely, pan, zoom (scroll wheel)
@@ -36,21 +34,12 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 
 **Appearance**
 - Background and block color + opacity
-- macOS vibrancy (under-window blur)
-
-**System**
-- Tray icon — click to show/hide
-- Global shortcut `⌘⇧V` — show/hide from anywhere
-- ⌘W hides the window instead of quitting
-- Launch at login (optional, off by default)
-- Window size persisted across restarts
 
 ## Tech stack
 
-- **Electron** — main process, IPC, tray, global shortcut
 - **React 18** + **TypeScript**
-- **Vite** + `vite-plugin-electron`
-- **electron-store** — persistent JSON storage
+- **Vite**
+- **localStorage** — persistent state (debounced writes)
 - **@dnd-kit** — drag-and-drop for blocks and tabs
 - **framer-motion** — animations
 - **Tailwind CSS** — styling
@@ -59,15 +48,10 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 ## Dev
 
 ```bash
-pnpm dev      # Vite dev server + Electron
-pnpm build    # TypeScript build + .dmg via electron-builder
+pnpm dev      # Vite dev server
+pnpm build    # TypeScript check + Vite build
+pnpm preview  # Preview production build
 pnpm lint     # ESLint + TypeScript check
-```
-
-Icon regeneration (run after changing `public/SlotPaste.svg`):
-
-```bash
-node scripts/gen-icons.mjs
 ```
 
 ## License

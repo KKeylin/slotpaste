@@ -20,7 +20,13 @@ interface Props {
 
 export default function DraggableBlock({ block, position, scale = 1, snapping = false, onSizeReport, ...rest }: Props) {
   const [wiggling, setWiggling] = useState(false)
+  const [showGlow, setShowGlow] = useState(true)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowGlow(false), 700)
+    return () => clearTimeout(t)
+  }, [])
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: block.id,
@@ -56,30 +62,31 @@ export default function DraggableBlock({ block, position, scale = 1, snapping = 
         top: position.y,
         transform: tx || ty ? `translate(${tx}px, ${ty}px)` : undefined,
         zIndex: isDragging ? 10 : 1,
+        opacity: isDragging ? 0.85 : 1,
         transition: isDragging ? 'none' : snapping ? 'left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)' : undefined,
       }}
     >
-      {/* glow on mount */}
-      <motion.div
-        initial={{ opacity: 0.7, scale: 0.9 }}
-        animate={{ opacity: 0, scale: 2.2 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: 16,
-          background: 'rgba(255,255,255,0.1)',
-          filter: 'blur(16px)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
+      {showGlow && (
+        <motion.div
+          initial={{ opacity: 0.6, scale: 0.9 }}
+          animate={{ opacity: 0, scale: 2.2 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 16,
+            background: 'rgba(255,255,255,0.1)',
+            filter: 'blur(16px)',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+      )}
 
-      {/* block entrance */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.82, y: 10 }}
-        animate={{ opacity: isDragging ? 0.85 : 1, scale: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 360, damping: 26 }}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
         style={{ position: 'relative', zIndex: 1 }}
       >
         <Block

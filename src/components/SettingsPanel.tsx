@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import colorWheelImg from '../assets/color-wheel-2.png'
@@ -59,19 +59,6 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
 
 export default function SettingsPanel({ isOpen, appearance, onChange, onClose }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
-  const [autoLaunch, setAutoLaunch] = useState(false)
-
-  useEffect(() => {
-    if (!isOpen || !window.electronAPI?.getAutoLaunch) return
-    window.electronAPI.getAutoLaunch().then(setAutoLaunch)
-  }, [isOpen])
-
-  function toggleAutoLaunch() {
-    if (!window.electronAPI?.setAutoLaunch) return
-    const next = !autoLaunch
-    setAutoLaunch(next)
-    window.electronAPI.setAutoLaunch(next)
-  }
 
   useEffect(() => {
     if (!isOpen) return
@@ -123,35 +110,6 @@ export default function SettingsPanel({ isOpen, appearance, onChange, onClose }:
             onColorChange={(blockColor) => onChange({ ...appearance, blockColor })}
             onOpacityChange={(blockOpacity) => onChange({ ...appearance, blockOpacity })}
           />
-
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
-
-          <button
-            onClick={toggleAutoLaunch}
-            className="flex items-center justify-between w-full"
-          >
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              Launch at login
-            </span>
-            <div
-              className="w-8 h-4.5 rounded-full relative transition-colors duration-200 flex-shrink-0"
-              style={{
-                width: '32px',
-                height: '18px',
-                backgroundColor: autoLaunch ? '#1D9E75' : 'rgba(255,255,255,0.12)',
-              }}
-            >
-              <div
-                className="absolute top-0.5 rounded-full transition-transform duration-200"
-                style={{
-                  width: '14px',
-                  height: '14px',
-                  backgroundColor: 'white',
-                  transform: autoLaunch ? 'translateX(16px)' : 'translateX(2px)',
-                }}
-              />
-            </div>
-          </button>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
 

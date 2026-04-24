@@ -4,54 +4,46 @@
 
 ## Project overview
 
-**SlotPaste** — десктопный clipboard manager для macOS (Electron + React + TypeScript),
-заточенный под job search workflow: храним текстовые блоки (cover letter snippets,
-ссылки, skills), копируем по клику, организуем по табам.
+**SlotPaste** — web-приложение (React + TypeScript + Vite), clipboard manager заточенный под job search workflow: храним текстовые блоки (cover letter snippets, ссылки, skills), копируем по клику, организуем по табам.
 
 ## Tech stack
 
-- **Electron** (main process, IPC, tray, global shortcut)
 - **React 18** + **TypeScript**
-- **Vite** (renderer bundler, electron-vite)
-- **electron-store** — персистентное хранение данных (JSON на диске)
+- **Vite** (bundler)
+- **localStorage** — персистентное хранение состояния
 - **@dnd-kit/core + @dnd-kit/sortable** — drag-and-drop блоков и табов
 - **framer-motion** — анимации (toast, modal, блоки)
 - **Tailwind CSS** — утилити-классы для стилей
-- CSS custom properties для кастомизации цвета/прозрачности
-
-Сборка в `.dmg`: `electron-builder` с таргетом `mac`.
 
 ## Project structure
 
 ```
 slotpaste/
-├── electron/
-│   ├── main.ts          # main process: окно, tray, global shortcut, IPC
-│   ├── preload.ts       # contextBridge: expose store API в renderer
-│   └── store.ts         # electron-store schema + typed get/set
 ├── src/
-│   ├── App.tsx          # root, провайдеры, layout
-│   ├── main.tsx         # renderer entry
+│   ├── App.tsx          # root, layout
+│   ├── main.tsx         # entry point
 │   ├── components/
-│   │   ├── TabBar.tsx           # табы + DnD сортировка табов
-│   │   ├── Tab.tsx              # один таб
-│   │   ├── BlockList.tsx        # список блоков + DnD
-│   │   ├── Block.tsx            # один блок (copy, edit, delete)
-│   │   ├── FreeCanvas.tsx       # свободное поле с DnD-позиционированием блоков
-│   │   ├── AddBlock.tsx         # форма добавления нового блока
-│   │   ├── Toast.tsx            # уведомление о копировании
-│   │   ├── EditModal.tsx        # модалка редактирования
-│   │   └── AppearancePanel.tsx  # настройки цвета/прозрачности фона и блоков
+│   │   ├── TabBar/          # табы + DnD сортировка (hooks.ts + index.tsx)
+│   │   ├── BlockList/       # canvas-режим, pan/zoom, блоки (hooks.ts + index.tsx)
+│   │   ├── Block/           # один блок (hooks.ts + index.tsx)
+│   │   ├── AddBlock/        # форма добавления блока (hooks.ts + index.tsx)
+│   │   ├── DraggableBlock.tsx   # обёртка useDraggable для canvas
+│   │   ├── EditPopup.tsx    # попап редактирования (portal)
+│   │   ├── ColorSwatches.tsx
+│   │   ├── ListView.tsx     # list-режим с DnD reorder
+│   │   ├── SettingsPanel.tsx
+│   │   └── Toast.tsx
 │   ├── hooks/
-│   │   ├── useStore.ts    # обёртка над electron-store через IPC
-│   │   ├── useClipboard.ts
+│   │   ├── useStore.ts    # localStorage persistence (debounced 400ms)
+│   │   ├── useClipboard.ts  # navigator.clipboard.writeText
 │   │   └── useToast.ts
 │   ├── types/
-│   │   └── index.ts       # Tab, Block, Appearance, Position
-│   └── styles/
-│       ├── globals.css    # CSS vars для темы
-│       └── tokens.css     # цвета, радиусы, шрифты
-├── electron-builder.yml
+│   │   └── index.ts       # Tab, Block, Appearance, AppState
+│   ├── utils/
+│   │   ├── collision.ts   # R-tree (rbush) collision detection
+│   │   ├── color.ts
+│   │   └── nanoid.ts
+│   └── constants.ts       # CANVAS_SIZE, LONG_PRESS_MS, BLOCK_DEFAULT_W/H, etc.
 ├── vite.config.ts
 ├── tsconfig.json
 └── package.json
@@ -63,26 +55,26 @@ slotpaste/
 interface Block {
   id: string;
   text: string;
-  color?: string;       // hex, опционально переопределяет тему
-  position?: {          // для free canvas режима
-    x: number;
-    y: number;
-  };
-  groupId?: string;     // группировка на канвасе
+  fontSize: FontSize;
+  color?: string;
+  position?: { x: number; y: number };
+  width?: number;
+  height?: number;
 }
 
 interface Tab {
   id: string;
   name: string;
   blocks: Block[];
-  viewMode: 'list' | 'canvas';  // список или свободное поле
+  viewMode: 'list' | 'canvas';
 }
 
 interface Appearance {
-  bgColor: string;          // hex
-  bgOpacity: number;        // 0–1
-  blockColor: string;       // hex
-  blockOpacity: number;     // 0–1 (блоки непрозрачные по умолчанию = 1)
+  bgColor: string;
+  bgOpacity: number;
+  blockColor: string;
+  blockOpacity: number;
+  recentColors: string[];
 }
 
 interface AppState {
@@ -98,54 +90,23 @@ interface AppState {
 
 ## Design decisions
 
-**Шрифт**: JetBrains Mono / монопространственный — ощущение dev-tool, не SaaS.
-
 **Тема по умолчанию**:
-- Фон: `#0e0e0e` @ 80% opacity (полупрозрачный, чтобы был macOS vibrancy эффект)
+- Фон: `#0e0e0e` @ 80% opacity
 - Блоки: непрозрачные, `#1a1a1a` с `border: 1px solid rgba(255,255,255,0.08)`
 - Акцент (copy success): `#1D9E75` (teal)
 - Danger: `#E24B4A`
 
-**Vibrancy**: в `main.ts` окно создаётся с `vibrancy: 'under-window'` и `backgroundMaterial: 'acrylic'` для нативного blur на macOS. Это работает только когда `backgroundColor` прозрачный.
+**Копирование**: `navigator.clipboard.writeText()` — plain text only. Никогда не использовать `ClipboardItem` или HTML/RTF типы.
 
-**Копирование**: клик по всей площади блока копирует. Кнопки edit/delete останавливают propagation.
+**Персистентность**: `useStore` сохраняет в localStorage с дебаунсом 400мс — обновления React немедленные, запись на диск батчится.
 
-**Toast**: появляется справа, текст `"${preview}" скопирован`, исчезает через 2.2s.
-
-## IPC channels (main ↔ renderer)
-
-```
-store:get       → возвращает всё состояние
-store:set       → сохраняет всё состояние
-clipboard:write → записывает текст в системный буфер (через main process)
-window:hide     → скрывает окно (для глобального shortcut toggle)
-```
+**Toast**: появляется снизу/сбоку, текст `"${preview}" скопирован`, исчезает через 2.2s.
 
 ## Dev commands
 
 ```bash
-pnpm dev        # Vite dev server + Electron
-pnpm build      # TypeScript build + electron-builder
+pnpm dev        # Vite dev server
+pnpm build      # tsc + vite build
+pnpm preview    # preview production build
 pnpm lint       # ESLint + TypeScript check
 ```
-
-## Setup (новый проект)
-
-```bash
-npm create electron-vite@latest slotpaste -- --template react-ts
-cd slotpaste
-pnpm install
-pnpm add electron-store @dnd-kit/core @dnd-kit/sortable framer-motion
-pnpm add -D electron-builder tailwindcss autoprefixer
-pnpm dlx tailwindcss init
-```
-
-## Key implementation notes
-
-- `electron-store` работает только в main process → expose через `contextBridge` в preload
-- DnD на free canvas: используй `useDraggable` из `@dnd-kit/core`, сохраняй `{x, y}` в block.position
-- Группировка на канвасе: при release с overlap > 50% предлагать создать группу (визуально — рамка вокруг группы блоков)
-- Vibrancy + прозрачность окна: `win.setBackgroundColor('#00000000')` в main.ts
-- Для macOS frameless: `titleBarStyle: 'hiddenInset'` сохраняет нативные traffic lights
-- electron-builder таргет: `{ target: 'dmg', arch: ['arm64', 'x64'] }` для universal binary
-- Clipboard always writes plain text only — `navigator.clipboard.writeText()` strips formatting by design. Never use `ClipboardItem` or write HTML/RTF types. If Electron IPC clipboard is added later (`clipboard.writeText()` in main process), same rule applies — text only, no `writeHTML()`. This is a core feature, not a bug.
