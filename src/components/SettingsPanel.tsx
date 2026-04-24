@@ -15,9 +15,9 @@ interface Props {
 interface ColorRowProps {
   label: string
   color: string
-  opacity: number
+  opacity?: number
   onColorChange: (color: string) => void
-  onOpacityChange: (opacity: number) => void
+  onOpacityChange?: (opacity: number) => void
 }
 
 function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: ColorRowProps) {
@@ -37,21 +37,24 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
           />
         </label>
 
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={Math.round(opacity * 100)}
-          onChange={(e) => onOpacityChange(Number(e.target.value) / 100)}
-          className="flex-1 h-1 rounded-full appearance-none cursor-pointer accent-white"
-          style={{
-            background: `linear-gradient(to right, rgba(255,255,255,0.7) ${Math.round(opacity * 100)}%, rgba(255,255,255,0.15) ${Math.round(opacity * 100)}%)`,
-          }}
-        />
-
-        <span className="text-[11px] w-8 text-right tabular-nums" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          {Math.round(opacity * 100)}%
-        </span>
+        {opacity !== undefined && onOpacityChange && (
+          <>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={Math.round(opacity * 100)}
+              onChange={(e) => onOpacityChange(Number(e.target.value) / 100)}
+              className="flex-1 h-1 rounded-full appearance-none cursor-pointer accent-white"
+              style={{
+                background: `linear-gradient(to right, rgba(255,255,255,0.7) ${Math.round(opacity * 100)}%, rgba(255,255,255,0.15) ${Math.round(opacity * 100)}%)`,
+              }}
+            />
+            <span className="text-[11px] w-8 text-right tabular-nums" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              {Math.round(opacity * 100)}%
+            </span>
+          </>
+        )}
       </div>
     </div>
   )
@@ -98,9 +101,7 @@ export default function SettingsPanel({ isOpen, appearance, onChange, onClose }:
           <ColorRow
             label="Background"
             color={appearance.bgColor}
-            opacity={appearance.bgOpacity}
             onColorChange={(bgColor) => onChange({ ...appearance, bgColor })}
-            onOpacityChange={(bgOpacity) => onChange({ ...appearance, bgOpacity })}
           />
 
           <ColorRow
@@ -109,6 +110,12 @@ export default function SettingsPanel({ isOpen, appearance, onChange, onClose }:
             opacity={appearance.blockOpacity}
             onColorChange={(blockColor) => onChange({ ...appearance, blockColor })}
             onOpacityChange={(blockOpacity) => onChange({ ...appearance, blockOpacity })}
+          />
+
+          <ColorRow
+            label="Accent"
+            color={appearance.accentColor}
+            onColorChange={(accentColor) => onChange({ ...appearance, accentColor })}
           />
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />

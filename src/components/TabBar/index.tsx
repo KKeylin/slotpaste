@@ -11,6 +11,7 @@ import { useTabBar } from './hooks'
 interface SortableTabProps {
   tab: Tab
   active: boolean
+  accentColor: string
   isEditing: boolean
   editingName: string
   wiggling: boolean
@@ -25,7 +26,7 @@ interface SortableTabProps {
 }
 
 function SortableTab({
-  tab, active, isEditing, editingName, wiggling, canDelete,
+  tab, active, accentColor, isEditing, editingName, wiggling, canDelete,
   onSelect, onDoubleClick, onEditChange, onEditBlur, onEditKeyDown,
   onLongPress, onDelete,
 }: SortableTabProps) {
@@ -101,7 +102,7 @@ function SortableTab({
             backgroundColor: active ? 'rgba(255,255,255,0.12)' : 'transparent',
             color: active ? 'rgba(255,255,255,0.87)' : 'rgba(255,255,255,0.35)',
             border: '1px solid',
-            borderColor: active ? 'rgba(255,255,255,0.15)' : 'transparent',
+            borderColor: active ? accentColor : 'transparent',
           }}
         >
           {isEditing ? (
@@ -141,6 +142,7 @@ function SortableTab({
 interface Props {
   tabs: Tab[]
   activeTabId: string
+  accentColor: string
   onSelect: (id: string) => void
   onAdd: () => void
   onRename: (id: string, name: string) => void
@@ -148,7 +150,7 @@ interface Props {
   onDelete: (id: string) => void
 }
 
-export default function TabBar({ tabs, activeTabId, onSelect, onAdd, onRename, onReorder, onDelete }: Props) {
+export default function TabBar({ tabs, activeTabId, accentColor, onSelect, onAdd, onRename, onReorder, onDelete }: Props) {
   const {
     editingId, editingName, setEditingName,
     wigglingId, setWigglingId,
@@ -163,7 +165,7 @@ export default function TabBar({ tabs, activeTabId, onSelect, onAdd, onRename, o
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <SortableContext items={tabs.map((t) => t.id)} strategy={horizontalListSortingStrategy}>
           <div
-            className="flex items-center gap-1 pr-3 pl-20 pt-3 pb-2 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+            className="flex items-center gap-1 pr-3 pl-3 pt-3 pb-2 overflow-x-auto [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none' }}
             onClick={() => setWigglingId(null)}
           >
@@ -172,6 +174,7 @@ export default function TabBar({ tabs, activeTabId, onSelect, onAdd, onRename, o
                 key={tab.id}
                 tab={tab}
                 active={tab.id === activeTabId}
+                accentColor={accentColor}
                 isEditing={editingId === tab.id}
                 editingName={editingName}
                 wiggling={wigglingId === tab.id}
@@ -189,7 +192,7 @@ export default function TabBar({ tabs, activeTabId, onSelect, onAdd, onRename, o
             <button
               onClick={onAdd}
               className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-opacity hover:opacity-80 ml-1"
-              style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}
+              style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: accentColor }}
             >
               <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
                 <path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

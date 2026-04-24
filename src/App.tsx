@@ -100,13 +100,14 @@ export default function App() {
     <div
       className="flex flex-col h-screen w-screen overflow-hidden"
       style={{
-        backgroundColor: `color-mix(in srgb, ${state.appearance.bgColor} ${state.appearance.bgOpacity * 100}%, transparent)`,
+        backgroundColor: state.appearance.bgColor,
       }}
     >
       <div className="relative">
         <TabBar
           tabs={state.tabs}
           activeTabId={state.activeTabId}
+          accentColor={state.appearance.accentColor}
           onSelect={(id) => patchState({ activeTabId: id })}
           onAdd={addTab}
           onRename={renameTab}
@@ -141,7 +142,7 @@ export default function App() {
       />
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
-        <div className="absolute top-2 right-2 z-10 flex flex-col rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="absolute top-2 right-2 z-10 flex flex-col rounded-xl overflow-hidden" style={{ border: `1px solid ${state.appearance.accentColor}` }}>
           {(['canvas', 'list'] as const).map((mode) => (
             <button
               key={mode}

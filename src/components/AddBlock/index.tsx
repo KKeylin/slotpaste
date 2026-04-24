@@ -41,7 +41,7 @@ export default function AddBlock({ appearance, onAdd }: Props) {
           style={{
             backgroundColor: hasCustomColor ? activeColor : 'rgba(255,255,255,0.06)',
             color: inputTextColor,
-            border: '1px solid rgba(255,255,255,0.08)',
+            border: `1px solid ${appearance.accentColor}`,
           }}
         />
 
