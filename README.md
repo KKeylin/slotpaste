@@ -15,16 +15,22 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 ## Features
 
 ### Done
-- Tabs: create, rename, switch
+- Tabs: create, rename (double-click), switch, reorder (drag), delete (long press → confirm)
+- New tab auto-focuses the name input on creation
 - Blocks: add, edit, delete, copy on click
 - Block resize (width + height)
 - Font size and per-block color in edit popup
 - Edit popup: flies out from block position, full-width overlay, confirm on unsaved changes
-- Free canvas: drag blocks to any position, persisted across sessions
+- Free canvas (10 000 × 10 000): drag blocks freely, pan, zoom (scroll wheel)
+- CENTER button — animated return to canvas center
+- New blocks placed below the last added block; camera follows smoothly
+- Smooth camera transition when switching tabs
+- Block entrance animation (spring + glow)
+- Color picker in AddBlock (swatches + color wheel, above the input)
+- Appearance panel: background and block color + opacity
 - Tab drag-and-drop sorting
 
 ### Planned
-- Appearance panel: background and block color + opacity
 - List / canvas mode toggle per tab
 - Block grouping on canvas
 - Tray icon + global shortcut (⌘⇧V) to show/hide
