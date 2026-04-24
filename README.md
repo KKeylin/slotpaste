@@ -1,12 +1,10 @@
 # SlotPaste
 
-A macOS desktop clipboard manager built for job search workflows — store text snippets (cover letters, skills, links), copy on click, organize in tabs.
-
-> **Status**: In development. Core features working — not yet packaged for distribution.
-
----
+A macOS clipboard manager built for job search workflows — store text snippets, copy on click, organize in tabs.
 
 <!-- TODO: screenshot or demo gif -->
+
+---
 
 ## Why
 
@@ -14,49 +12,62 @@ Filling out job applications means pasting the same blocks of text dozens of tim
 
 ## Features
 
-### Done
-- Tabs: create, rename (double-click), switch, reorder (drag), delete (long press → confirm)
-- New tab auto-focuses the name input on creation
-- Blocks: add, edit, delete (long press → wiggle → confirm), copy on click
-- Block resize (width + height)
-- Font size and per-block color in edit popup
-- Edit popup: flies out from block position, full-width overlay, confirm on unsaved changes
-- Free canvas (10 000 × 10 000): drag blocks freely, pan, zoom (scroll wheel)
-- CENTER button — animated return to canvas center
-- New blocks placed below the last added block; camera follows smoothly
-- Smooth camera transition when switching tabs
-- Block entrance animation (spring + glow)
-- Color picker in AddBlock (swatches + color wheel, above the input)
-- Appearance panel: background and block color + opacity
-- Tab drag-and-drop sorting
-- SF Pro system font (no external import)
-- Collision detection: blocks never overlap — R-tree spatial index (rbush) + aggregate MTV resolution; snap animation on drag/resize; ResizeObserver for accurate real-time bounding boxes
+**Tabs**
+- Create, rename (double-click), switch, reorder (drag), delete (long press → confirm)
+- Auto-focuses name input on creation
+- List or canvas mode per tab, persisted across restarts
+
+**Blocks**
+- Add, copy on click, delete (long press → wiggle → confirm)
+- Edit popup: font size, per-block color, delete — flies out from block position
+- Resize (width + height) via drag handle
+- Color picker: swatches + color wheel
+
+**Free Canvas**
+- 10 000 × 10 000 canvas — drag blocks freely, pan, zoom (scroll wheel)
+- CENTER button — animated return to center
+- Camera follows new blocks and tab switches smoothly
+- Entrance animation (spring + glow)
+- Collision detection: blocks never overlap on add, drag, or resize (R-tree + aggregate MTV)
 - Scale-aware resize: cursor and block edge stay in sync at any zoom level
 
-### Planned
-- List / canvas mode toggle per tab
-- Block grouping on canvas
-- Tray icon + global shortcut (⌘⇧V) to show/hide
-- Frameless window with native macOS traffic lights
-- `.dmg` build
+**List Mode**
+- Vertical scrollable list with drag-to-reorder
+
+**Appearance**
+- Background and block color + opacity
+- macOS vibrancy (under-window blur)
+
+**System**
+- Tray icon — click to show/hide
+- Global shortcut `⌘⇧V` — show/hide from anywhere
+- ⌘W hides the window instead of quitting
+- Launch at login (optional, off by default)
+- Window size persisted across restarts
 
 ## Tech stack
 
 - **Electron** — main process, IPC, tray, global shortcut
 - **React 18** + **TypeScript**
-- **Vite** via `electron-vite`
+- **Vite** + `vite-plugin-electron`
 - **electron-store** — persistent JSON storage
-- **@dnd-kit** — drag-and-drop
+- **@dnd-kit** — drag-and-drop for blocks and tabs
 - **framer-motion** — animations
 - **Tailwind CSS** — styling
 - **rbush** — R-tree spatial index for collision detection
 
-## Dev commands
+## Dev
 
 ```bash
 pnpm dev      # Vite dev server + Electron
-pnpm build    # TypeScript build + electron-builder
+pnpm build    # TypeScript build + .dmg via electron-builder
 pnpm lint     # ESLint + TypeScript check
+```
+
+Icon regeneration (run after changing `public/SlotPaste.svg`):
+
+```bash
+node scripts/gen-icons.mjs
 ```
 
 ## License
