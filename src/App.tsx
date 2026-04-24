@@ -8,7 +8,8 @@ import Toast from './components/Toast'
 import SettingsPanel from './components/SettingsPanel'
 import type { AppState, Block, Tab } from './types'
 import { nanoid } from './utils/nanoid'
-import { findFreePosition, BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from './utils/collision'
+import { findFreePosition } from './utils/collision'
+import { BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from './constants'
 
 export default function App() {
   const { state, updateState, ready } = useStore()

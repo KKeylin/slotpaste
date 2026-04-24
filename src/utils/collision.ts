@@ -1,9 +1,6 @@
 import RBush from 'rbush'
 import type { Block } from '../types'
-
-export const BLOCK_DEFAULT_W = 220
-export const BLOCK_DEFAULT_H = 90
-export const EDIT_OVERHANG = 25  // 19px button + 4px gap + 2px safety
+import { BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from '../constants'
 
 const QUERY_RADIUS_FACTOR = 2.5
 const MAX_ITER = 30

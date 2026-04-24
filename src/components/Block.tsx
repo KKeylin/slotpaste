@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { Block as BlockType, FontSize, Appearance } from '../types'
 import { getLuminance, isColorDark } from '../utils/color'
 import EditPopup from './EditPopup'
-
-const LONG_PRESS_MS = 1500
+import { LONG_PRESS_MS } from '../constants'
 
 const fontSizeClasses: Record<FontSize, string> = {
   h1: 'text-2xl font-medium',

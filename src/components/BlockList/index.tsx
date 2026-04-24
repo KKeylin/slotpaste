@@ -2,7 +2,8 @@ import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import type { Block as BlockType, Appearance } from '../../types'
 import DraggableBlock from '../DraggableBlock'
 import AddBlock from '../AddBlock'
-import { useCanvas, useBlockSnap, CANVAS_SIZE } from './hooks'
+import { useCanvas, useBlockSnap } from './hooks'
+import { CANVAS_SIZE } from '../../constants'
 
 interface Props {
   blocks: BlockType[]

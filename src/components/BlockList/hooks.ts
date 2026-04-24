@@ -1,9 +1,8 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { DragEndEvent } from '@dnd-kit/core'
 import type { Block as BlockType } from '../../types'
-import { findFreePosition, BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from '../../utils/collision'
-
-export const CANVAS_SIZE = 10000
+import { findFreePosition } from '../../utils/collision'
+import { CANVAS_SIZE, BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from '../../constants'
 
 export function useCanvas(blocks: BlockType[], activeTabId: string) {
   const containerRef = useRef<HTMLDivElement>(null)

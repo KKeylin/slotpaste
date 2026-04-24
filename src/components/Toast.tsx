@@ -1,11 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Toast as ToastType } from '../hooks/useToast'
+import { MAX_PREVIEW } from '../constants'
 
 interface Props {
   toast: ToastType | null
 }
-
-const MAX_PREVIEW = 32
 
 export default function Toast({ toast }: Props) {
   return (

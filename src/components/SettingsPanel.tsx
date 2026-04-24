@@ -3,8 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import colorWheelImg from '../assets/color-wheel-2.png'
 import type { Appearance } from '../types'
-
-const VERSION = '0.1.0'
+import { VERSION } from '../constants'
 
 interface Props {
   isOpen: boolean
