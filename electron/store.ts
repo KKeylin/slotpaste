@@ -7,7 +7,7 @@ const defaultState: AppState = {
       id: 'default',
       name: 'General',
       blocks: [],
-      viewMode: 'list',
+      viewMode: 'canvas',
     },
   ],
   activeTabId: 'default',

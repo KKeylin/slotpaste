@@ -4,7 +4,7 @@ import type { AppState } from '../types'
 const LS_KEY = 'slotpaste_state'
 
 const defaultState: AppState = {
-  tabs: [{ id: 'default', name: 'General', blocks: [], viewMode: 'list' }],
+  tabs: [{ id: 'default', name: 'General', blocks: [], viewMode: 'canvas' }],
   activeTabId: 'default',
   appearance: {
     bgColor: '#0e0e0e',
