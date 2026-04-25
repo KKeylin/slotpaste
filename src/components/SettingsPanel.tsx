@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import colorWheelImg from '../assets/color-wheel-2.png'
@@ -62,16 +62,24 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
 
 export default function SettingsPanel({ isOpen, appearance, onChange, onClose }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)')
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => {
     if (!isOpen) return
-    function handleOutside(e: MouseEvent) {
+    function handleOutside(e: PointerEvent) {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
         onClose()
       }
     }
-    document.addEventListener('mousedown', handleOutside)
-    return () => document.removeEventListener('mousedown', handleOutside)
+    document.addEventListener('pointerdown', handleOutside)
+    return () => document.removeEventListener('pointerdown', handleOutside)
   }, [isOpen])
 
   return createPortal(
@@ -80,14 +88,23 @@ export default function SettingsPanel({ isOpen, appearance, onChange, onClose }:
         <motion.div
           ref={panelRef}
           key="settings"
-          initial={{ opacity: 0, scale: 0.9, y: -8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: -8 }}
+          initial={isMobile ? { opacity: 0, y: 24 } : { opacity: 0, scale: 0.9, y: -8 }}
+          animate={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+          exit={isMobile ? { opacity: 0, y: 24 } : { opacity: 0, scale: 0.9, y: -8 }}
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-          className="fixed z-300 flex flex-col gap-5 p-5 rounded-2xl w-72"
-          style={{
+          className="fixed z-300 flex flex-col gap-5 p-5 rounded-2xl"
+          style={isMobile ? {
+            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
+            left: 8,
+            right: 8,
+            backgroundColor: '#1a1a1a',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 -8px 48px rgba(0,0,0,0.6)',
+            transformOrigin: 'bottom center',
+          } : {
             top: 44,
             right: 8,
+            width: 288,
             backgroundColor: '#1a1a1a',
             border: '1px solid rgba(255,255,255,0.1)',
             boxShadow: '0 16px 48px rgba(0,0,0,0.6)',

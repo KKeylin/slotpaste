@@ -17,7 +17,7 @@ export default function AddBlock({ appearance, onAdd }: Props) {
   } = useAddBlock(appearance, onAdd)
 
   return (
-    <div className="flex flex-col gap-1.5 px-3 pb-3 pt-1">
+    <div className="flex flex-col gap-1.5 px-3 pt-1" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
       <div className="px-1">
         <ColorSwatches
           colors={swatchColors}
@@ -35,7 +35,7 @@ export default function AddBlock({ appearance, onAdd }: Props) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="New block… (Shift+Enter for newline)"
+          placeholder="New block…"
           rows={2}
           className="flex-1 resize-none rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-200 placeholder:opacity-30"
           style={{

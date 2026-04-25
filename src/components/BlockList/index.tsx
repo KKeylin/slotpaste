@@ -29,7 +29,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div ref={containerRef} className="relative flex-1 overflow-hidden">
+      <div ref={containerRef} className="relative flex-1 overflow-hidden" style={{ touchAction: 'none' }}>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <div
             ref={canvasRef}
@@ -77,8 +77,8 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
 
         <button
           onClick={resetView}
-          className="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80"
-          style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
+          className="absolute right-3 px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80"
+          style={{ bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))', backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
         >
           ⌖ CENTER
         </button>
