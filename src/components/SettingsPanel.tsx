@@ -8,8 +8,13 @@ import { VERSION } from '../constants'
 interface Props {
   isOpen: boolean
   appearance: Appearance
+  secureEnabled: boolean
+  secureLocked: boolean
   onChange: (appearance: Appearance) => void
   onClose: () => void
+  onEnableSecure: () => void
+  onDisableSecure: () => void
+  onChangePassword: () => void
 }
 
 interface ColorRowProps {
@@ -28,7 +33,7 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
       </span>
       <div className="flex items-center gap-3">
         <label className="w-7 h-7 rounded-full cursor-pointer hover:opacity-80 relative overflow-hidden flex-shrink-0">
-          <img src={colorWheelImg} className="w-full h-full object-cover rounded-full" />
+          <img src={colorWheelImg} className="w-full h-full object-cover rounded-full" alt="colorWheel" />
           <input
             type="color"
             value={color}
@@ -60,7 +65,7 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
   )
 }
 
-export default function SettingsPanel({ isOpen, appearance, onChange, onClose }: Props) {
+export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
 
@@ -134,6 +139,43 @@ export default function SettingsPanel({ isOpen, appearance, onChange, onClose }:
             color={appearance.accentColor}
             onColorChange={(accentColor) => onChange({ ...appearance, accentColor })}
           />
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+
+          <div className="flex flex-col gap-3">
+            <span className="text-[10px] font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Security
+            </span>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>Secure Mode</span>
+                {secureEnabled && (
+                  <span className="text-[10px]" style={{ color: secureLocked ? '#E24B4A' : '#1D9E75' }}>
+                    {secureLocked ? 'Locked' : 'Unlocked'}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={secureEnabled ? onDisableSecure : onEnableSecure}
+                className="px-3 py-1.5 rounded-xl text-[10px] font-medium transition-opacity hover:opacity-80"
+                style={{
+                  backgroundColor: secureEnabled ? 'rgba(226,75,74,0.15)' : 'rgba(29,158,117,0.15)',
+                  color: secureEnabled ? '#E24B4A' : '#1D9E75',
+                }}
+              >
+                {secureEnabled ? 'Disable' : 'Enable'}
+              </button>
+            </div>
+            {secureEnabled && (
+              <button
+                onClick={onChangePassword}
+                className="py-1.5 rounded-xl text-[10px] font-medium transition-opacity hover:opacity-80 text-center"
+                style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.45)' }}
+              >
+                Change password
+              </button>
+            )}
+          </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
 
