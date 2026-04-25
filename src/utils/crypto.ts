@@ -90,7 +90,7 @@ export function estimateCrackTime(password: string): CrackEstimate | null {
   const MIN = 60, HOUR = 3600, DAY = 86400, YEAR = DAY * 365
 
   if (seconds < MIN)         return { label: 'under a minute',               hint: 'shorter than a TikTok 🎵',                       level: 'weak' }
-  if (seconds < HOUR)        return { label: `~${Math.ceil(seconds / MIN)} minutes`,   hint: 'about one Supernatural episode 👻',       level: 'weak' }
+  if (seconds < HOUR)        return { label: `~${Math.ceil(seconds / MIN)} minutes`,   hint: 'shorter than a lunch break 🥪',       level: 'weak' }
   if (seconds < DAY)         return { label: `~${Math.ceil(seconds / HOUR)} hours`,    hint: 'a few Marvel movies back to back 🦸',     level: 'medium' }
   if (seconds < DAY * 30)    return { label: `~${Math.ceil(seconds / DAY)} days`,      hint: 'a Death Stranding 2 playthrough 🧵',      level: 'medium' }
   if (seconds < YEAR)        return { label: `~${Math.ceil(seconds / (DAY * 30))} months`, hint: 'a Game of Thrones season rewatch 🐉', level: 'strong' }

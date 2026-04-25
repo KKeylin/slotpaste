@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'SlotPaste',
         short_name: 'SlotPaste',
-        description: 'Clipboard manager for job search',
+        description: 'Store your snippets, copy in one tap. Fast, organized, secure.',
         theme_color: '#0e0e0e',
         background_color: '#0e0e0e',
         display: 'standalone',

@@ -1,12 +1,12 @@
 # SlotPaste
 
-A web clipboard manager built for job search workflows — store text snippets, copy on click, organize in tabs.
+Store any text you reuse — copy it back in one tap. Fast, organized, and secure.
 
 ---
 
 ## Why
 
-Filling out job applications means pasting the same blocks of text dozens of times a day. SlotPaste keeps them one click away, organized the way you think, without leaving your flow.
+Some text you type over and over. SlotPaste keeps those snippets one click away, organized in tabs the way you think, with optional end-to-end encryption for anything sensitive.
 
 ## Features
 

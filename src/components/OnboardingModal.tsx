@@ -16,7 +16,7 @@ const SLIDES: SlideData[] = [
       </svg>
     ),
     title: 'Welcome to SlotPaste',
-    body: 'A clipboard manager built for job search. Keep cover letter snippets, links, and skills in one place — always a tap away.',
+    body: 'Your personal snippet storage — keep any text you reuse in one place and paste it instantly. Fast, organized, and secure.',
   },
   {
     icon: (
