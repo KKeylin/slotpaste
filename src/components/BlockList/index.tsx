@@ -21,7 +21,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
 
-  const { containerRef, canvasRef, pan, scale, scaleRef, resetView, pointerHandlers } =
+  const { containerRef, canvasRef, pan, scale, scaleRef, resetView, resetZoom, pointerHandlers } =
     useCanvas(blocks, activeTabId)
 
   const { snappingIds, handleSizeReport, handleResizeEnd, handleDragEnd } =
@@ -75,13 +75,25 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
           </div>
         </DndContext>
 
-        <button
-          onClick={resetView}
-          className="absolute right-3 px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80"
-          style={{ bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))', backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
+        <div
+          className="absolute right-3 flex flex-col gap-1.5"
+          style={{ bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}
         >
-          ⌖ CENTER
-        </button>
+          <button
+            onClick={resetZoom}
+            className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80 tabular-nums"
+            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
+          >
+            {Math.round(scale * 100)}%
+          </button>
+          <button
+            onClick={resetView}
+            className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80"
+            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
+          >
+            ⌖ CENTER
+          </button>
+        </div>
       </div>
       <AddBlock appearance={appearance} onAdd={onAdd} />
     </div>

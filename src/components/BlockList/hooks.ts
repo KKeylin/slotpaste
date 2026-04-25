@@ -132,6 +132,26 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     }, { once: true })
   }
 
+  function resetZoom() {
+    if (!containerRef.current || !canvasRef.current) return
+    const { width, height } = containerRef.current.getBoundingClientRect()
+    const cx = width / 2
+    const cy = height / 2
+    const newPan = {
+      x: cx - (cx - panRef.current.x) * (1 / scaleRef.current),
+      y: cy - (cy - panRef.current.y) * (1 / scaleRef.current),
+    }
+    panRef.current = newPan
+    scaleRef.current = 1
+    canvasRef.current.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+    canvasRef.current.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(1)`
+    setPan({ ...newPan })
+    setScale(1)
+    canvasRef.current.addEventListener('transitionend', () => {
+      if (canvasRef.current) canvasRef.current.style.transition = ''
+    }, { once: true })
+  }
+
   return {
     containerRef,
     canvasRef,
@@ -139,6 +159,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     scale,
     scaleRef,
     resetView,
+    resetZoom,
     pointerHandlers: {
       onPointerDown: handlePointerDown,
       onPointerMove: handlePointerMove,
