@@ -62,7 +62,7 @@ export default function EditPopup({
     onCancel()
   }
 
-  function handleOverlayClick(e: React.MouseEvent) {
+  function handleOverlayClick(e: React.PointerEvent) {
     if (e.target !== e.currentTarget) return
     if (hasChanges()) {
       setConfirmOpen(true)
@@ -148,7 +148,7 @@ export default function EditPopup({
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-200"
             style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}
-            onMouseDown={handleOverlayClick}
+            onPointerDown={handleOverlayClick}
           />
 
           {/* popup */}
@@ -168,7 +168,7 @@ export default function EditPopup({
               transformOrigin: position.transformOrigin,
               boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
             }}
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
           >
             {/* textarea */}
             <div className="flex-1 overflow-auto px-4 pt-4 pb-2 min-h-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
@@ -260,7 +260,7 @@ export default function EditPopup({
                 transition={{ duration: 0.12 }}
                 className="fixed inset-0 z-202 flex items-center justify-center"
                 style={{ backgroundColor: 'rgba(0,0,0,0.35)' }}
-                onMouseDown={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
               >
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}

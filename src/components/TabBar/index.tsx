@@ -94,7 +94,7 @@ function SortableTab({
           {...listeners}
           onClick={onSelect}
           onDoubleClick={onDoubleClick}
-          className="px-3 py-1 rounded-full text-xs cursor-pointer transition-all select-none"
+          className="px-3 py-2 rounded-full text-xs cursor-pointer transition-all select-none"
           style={{
             transform: CSS.Transform.toString(transform),
             transition,

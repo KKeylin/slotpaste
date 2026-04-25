@@ -98,7 +98,7 @@ export default function App() {
 
   return (
     <div
-      className="flex flex-col h-screen w-screen overflow-hidden"
+      className="flex flex-col h-[100dvh] w-screen overflow-hidden"
       style={{
         backgroundColor: state.appearance.bgColor,
       }}
@@ -116,7 +116,7 @@ export default function App() {
         />
         <button
           onClick={() => setSettingsOpen((v) => !v)}
-          className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center transition-opacity hover:opacity-75"
+          className="absolute top-0 right-0 w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
           style={{
             borderBottomLeftRadius: '12px',
             backgroundColor: isColorDark(state.appearance.bgColor)
@@ -147,7 +147,7 @@ export default function App() {
             <button
               key={mode}
               onClick={() => patchTab(activeTab.id, { viewMode: mode })}
-              className="px-3 py-1.5 text-[10px] font-medium tracking-wide transition-colors"
+              className="px-4 py-3 text-[10px] font-medium tracking-wide transition-colors"
               style={{
                 backgroundColor: activeTab.viewMode === mode ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.03)',
                 color: activeTab.viewMode === mode ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.25)',
