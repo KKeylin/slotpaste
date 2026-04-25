@@ -26,8 +26,15 @@ export interface Appearance {
   recentColors: string[]
 }
 
+export interface SecureConfig {
+  enabled: boolean
+  salt: string
+  verifyToken: string
+}
+
 export interface AppState {
   tabs: Tab[]
   activeTabId: string
   appearance: Appearance
+  secure?: SecureConfig
 }
