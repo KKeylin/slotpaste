@@ -32,16 +32,23 @@ export default function App() {
 
   const secureMode = useSecureMode(state.secure)
 
+  const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
+  const allBlocks = state.tabs.flatMap(t => t.blocks)
+  const isSecureEnabled = !!state.secure?.enabled
+
+  // Blocks with decrypted/masked text for display — must stay before early return
+  const displayBlocks = useMemo(
+    () => (activeTab?.blocks ?? []).map(b => ({ ...b, text: secureMode.getDisplayText(b.id, b.text) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeTab?.blocks, secureMode.isLocked, secureMode.decryptedTexts]
+  )
+
   function closeHelp() {
     localStorage.setItem('slotpaste_onboarded', '1')
     setHelpOpen(false)
   }
 
   if (!ready) return null
-
-  const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
-  const allBlocks = state.tabs.flatMap(t => t.blocks)
-  const isSecureEnabled = !!state.secure?.enabled
 
   function patchState(patch: Partial<AppState>) {
     updateState({ ...state, ...patch })
@@ -119,13 +126,6 @@ export default function App() {
       appearance: { ...state.appearance, recentColors },
     })
   }
-
-  // Blocks with decrypted/masked text for display
-  const displayBlocks = useMemo(() =>
-    activeTab.blocks.map(b => ({ ...b, text: secureMode.getDisplayText(b.id, b.text) })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeTab.blocks, secureMode.isLocked, secureMode.decryptedTexts]
-  )
 
   // --- Secure mode operations ---
 
