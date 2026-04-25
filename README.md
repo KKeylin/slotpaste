@@ -35,6 +35,10 @@ Some text you type over and over. SlotPaste keeps those snippets one click away,
 **Appearance**
 - Background color, block color + opacity, accent color (borders, icons)
 
+**Data**
+- Export all data to JSON (includes encrypted content as-is if Secure Mode is on)
+- Import JSON with replace confirmation; password-protected files prompt for verification
+
 ## Tech stack
 
 - **React 18** + **TypeScript**

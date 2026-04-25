@@ -15,6 +15,8 @@ interface Props {
   onEnableSecure: () => void
   onDisableSecure: () => void
   onChangePassword: () => void
+  onExport: () => void
+  onImportFile: (file: File) => void
 }
 
 interface ColorRowProps {
@@ -65,8 +67,9 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
   )
 }
 
-export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword }: Props) {
+export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
 
   useEffect(() => {
@@ -175,6 +178,41 @@ export default function SettingsPanel({ isOpen, appearance, secureEnabled, secur
                 Change password
               </button>
             )}
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+
+          <div className="flex flex-col gap-3">
+            <span className="text-[10px] font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Data
+            </span>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) onImportFile(file)
+                e.target.value = ''
+              }}
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={onExport}
+                className="flex-1 py-1.5 rounded-xl text-[10px] font-medium transition-opacity hover:opacity-80"
+                style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
+              >
+                Export JSON
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 py-1.5 rounded-xl text-[10px] font-medium transition-opacity hover:opacity-80"
+                style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
+              >
+                Import JSON
+              </button>
+            </div>
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />

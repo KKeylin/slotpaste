@@ -11,6 +11,7 @@ import Toast from './components/Toast'
 import SettingsPanel from './components/SettingsPanel'
 import OnboardingModal from './components/OnboardingModal'
 import SecureModal from './components/SecureModal'
+import ImportConfirmModal from './components/ImportConfirmModal'
 import type { AppState, Block, Tab } from './types'
 import { nanoid } from './utils/nanoid'
 import { findFreePosition } from './utils/collision'
@@ -18,7 +19,7 @@ import { isColorDark } from './utils/color'
 import { deriveKey, encryptText, decryptText, generateSalt, createVerifyToken, verifyKey } from './utils/crypto'
 import { BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from './constants'
 
-type SecureModalIntent = 'unlock' | 'enable' | 'disable' | 'change-verify' | 'change-set' | null
+type SecureModalIntent = 'unlock' | 'enable' | 'disable' | 'change-verify' | 'change-set' | 'import-verify' | null
 
 export default function App() {
   const { state, updateState, ready } = useStore()
@@ -29,6 +30,7 @@ export default function App() {
   const [secureIntent, setSecureIntent] = useState<SecureModalIntent>(null)
   const [secureError, setSecureError] = useState('')
   const [secureLoading, setSecureLoading] = useState(false)
+  const [pendingImport, setPendingImport] = useState<AppState | null>(null)
 
   const secureMode = useSecureMode(state.secure)
 
@@ -110,6 +112,40 @@ export default function App() {
     patchTab(activeTab.id, { blocks: activeTab.blocks.filter((b) => b.id !== id) })
   }
 
+  function handleExport() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `slotpaste-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function handleImportFile(file: File) {
+    file.text().then((raw) => {
+      try {
+        const parsed = JSON.parse(raw) as AppState
+        if (!Array.isArray(parsed.tabs) || !parsed.activeTabId) { showToast('Invalid file'); return }
+        setPendingImport(parsed)
+      } catch {
+        showToast('Invalid file')
+      }
+    })
+  }
+
+  function handleImportConfirm() {
+    if (!pendingImport) return
+    if (pendingImport.secure?.enabled) {
+      setSecureError('')
+      setSecureIntent('import-verify')
+    } else {
+      updateState(pendingImport)
+      secureMode.lock()
+      setPendingImport(null)
+    }
+  }
+
   async function changeBlockAndColors(updated: Block, recentColors: string[]) {
     let stored = updated
     if (isSecureEnabled && !secureMode.isLocked) {
@@ -179,6 +215,17 @@ export default function App() {
         setSecureIntent('change-set')
       }
 
+      else if (secureIntent === 'import-verify') {
+        if (!pendingImport?.secure) { setSecureIntent(null); return }
+        const key = await deriveKey(password, pendingImport.secure.salt)
+        const ok = await verifyKey(key, pendingImport.secure.verifyToken)
+        if (!ok) { setSecureError('Wrong password'); setSecureLoading(false); return }
+        updateState(pendingImport)
+        secureMode.lock()
+        setPendingImport(null)
+        setSecureIntent(null)
+      }
+
       else if (secureIntent === 'change-set') {
         const salt = generateSalt()
         const key = await deriveKey(password, salt)
@@ -208,7 +255,7 @@ export default function App() {
 
   return (
     <div
-      className="flex flex-col h-[100dvh] w-screen overflow-hidden"
+      className="flex flex-col h-dvh w-screen overflow-hidden"
       style={{ backgroundColor: state.appearance.bgColor }}
     >
       <div className="relative">
@@ -271,6 +318,8 @@ export default function App() {
         onEnableSecure={() => { setSecureError(''); setSecureIntent('enable') }}
         onDisableSecure={() => { setSecureError(''); setSecureIntent('disable') }}
         onChangePassword={() => { setSecureError(''); setSecureIntent('change-verify') }}
+        onExport={handleExport}
+        onImportFile={handleImportFile}
       />
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
@@ -319,6 +368,16 @@ export default function App() {
 
       <AnimatePresence>
         {helpOpen && <OnboardingModal onClose={closeHelp} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {pendingImport && !secureIntent && (
+          <ImportConfirmModal
+            hasSecure={!!pendingImport.secure?.enabled}
+            onConfirm={handleImportConfirm}
+            onCancel={() => setPendingImport(null)}
+          />
+        )}
       </AnimatePresence>
 
       <AnimatePresence>
