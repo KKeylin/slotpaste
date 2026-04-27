@@ -13,6 +13,7 @@ import SettingsPanel from './components/SettingsPanel'
 import OnboardingModal from './components/OnboardingModal'
 import SecureModal from './components/SecureModal'
 import ImportConfirmModal from './components/ImportConfirmModal'
+import { LockIcon, UnlockIcon, HelpIcon, SettingsIcon } from './components/icons'
 import type { AppState, Block, Tab } from './types'
 import { nanoid } from './utils/nanoid'
 import { findFreePosition } from './utils/collision'
@@ -155,15 +156,7 @@ export default function App() {
               className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
               style={{ ...btnBase, opacity: 0.7 }}
             >
-              {secureMode.isLocked ? (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-                </svg>
-              ) : (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 1C9.24 1 7 3.24 7 6v1H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2h-1V6c0-2.76-2.24-5-5-5zm0 2c1.66 0 3 1.34 3 3v1H9V6c0-1.66 1.34-3 3-3zm0 9c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
-                </svg>
-              )}
+              {secureMode.isLocked ? <LockIcon /> : <UnlockIcon />}
             </button>
           )}
           <button
@@ -171,18 +164,14 @@ export default function App() {
             className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
             style={{ ...btnBase, borderBottomLeftRadius: isSecureEnabled ? 0 : '12px', opacity: helpOpen ? 1 : 0.7 }}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>
-            </svg>
+            <HelpIcon />
           </button>
           <button
             onClick={() => setSettingsOpen((v) => !v)}
             className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
             style={{ ...btnBase, opacity: settingsOpen ? 1 : 0.7 }}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.92c.04-.34.07-.67.07-1s-.03-.67-.07-1l2.16-1.68c.19-.15.24-.42.12-.64l-2.04-3.53c-.12-.22-.39-.3-.61-.22l-2.55 1.03c-.54-.42-1.11-.77-1.74-1.03l-.38-2.71C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.71c-.63.26-1.2.61-1.74 1.03L4.84 5.13c-.22-.08-.49 0-.61.22L2.19 8.88c-.13.22-.07.49.12.64l2.16 1.68c-.04.33-.07.67-.07 1s.03.67.07 1l-2.16 1.68c-.19.15-.24.42-.12.64l2.04 3.53c.12.22.39.3.61.22l2.55-1.03c.54.42 1.11.77 1.74 1.03l.38 2.71c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.71c.63-.26 1.2-.61 1.74-1.03l2.55 1.03c.22.08.49 0 .61-.22l2.04-3.53c.12-.22.07-.49-.12-.64l-2.16-1.68z"/>
-            </svg>
+            <SettingsIcon />
           </button>
         </div>
       </div>
