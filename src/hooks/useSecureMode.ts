@@ -8,6 +8,10 @@ export function useSecureMode(secure: SecureConfig | undefined) {
   const [decryptedTexts, setDecryptedTexts] = useState<Record<string, string>>({})
 
   useEffect(() => {
+    if (secure?.enabled && !keyRef.current) setIsLocked(true)
+  }, [secure?.enabled])
+
+  useEffect(() => {
     if (!secure?.enabled) return
     const onUnload = () => { keyRef.current = null }
     window.addEventListener('beforeunload', onUnload)
@@ -21,7 +25,13 @@ export function useSecureMode(secure: SecureConfig | undefined) {
       const ok = await verifyKey(key, secure.verifyToken)
       if (!ok) return false
       const entries: [string, string][] = await Promise.all(
-        allBlocks.map(async b => [b.id, await decryptText(b.text, key)] as [string, string])
+        allBlocks.map(async b => {
+          try {
+            return [b.id, await decryptText(b.text, key)] as [string, string]
+          } catch {
+            return [b.id, b.text] as [string, string]
+          }
+        })
       )
       keyRef.current = key
       setDecryptedTexts(Object.fromEntries(entries))

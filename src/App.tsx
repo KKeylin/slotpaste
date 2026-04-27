@@ -13,7 +13,8 @@ import SettingsPanel from './components/SettingsPanel'
 import OnboardingModal from './components/OnboardingModal'
 import SecureModal from './components/SecureModal'
 import ImportConfirmModal from './components/ImportConfirmModal'
-import { LockIcon, UnlockIcon, HelpIcon, SettingsIcon } from './components/icons'
+import ResetModal from './components/ResetModal'
+import { LockIcon, HelpIcon, SettingsIcon } from './components/icons'
 import type { AppState, Block, Tab } from './types'
 import { nanoid } from './utils/nanoid'
 import { findFreePosition } from './utils/collision'
@@ -26,6 +27,7 @@ export default function App() {
   const { toast, showToast } = useToast()
   const copy = useClipboard((text) => showToast(text))
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [resetOpen, setResetOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(() => !localStorage.getItem('slotpaste_onboarded'))
 
   const secureMode = useSecureMode(state.secure)
@@ -105,6 +107,11 @@ export default function App() {
     patchTab(activeTab.id, { blocks: activeTab.blocks.filter((b) => b.id !== id) })
   }
 
+  function handleReset() {
+    localStorage.removeItem('slotpaste_state')
+    window.location.reload()
+  }
+
   function handleExport() {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -153,16 +160,22 @@ export default function App() {
           {isSecureEnabled && (
             <button
               onClick={() => secureMode.isLocked ? secureOps.open(SECURE_INTENT.UNLOCK) : secureMode.lock()}
-              className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
-              style={{ ...btnBase, opacity: 0.7 }}
+              className="w-10 h-10 flex items-center justify-center mr-2 hover:opacity-80"
+              style={{
+                backgroundColor: secureMode.isLocked ? '#E24B4A' : '#1D9E75',
+                color: 'white',
+                borderBottomLeftRadius: '12px',
+                borderBottomRightRadius: '12px',
+                transition: 'background-color 0.3s ease',
+              }}
             >
-              {secureMode.isLocked ? <LockIcon /> : <UnlockIcon />}
+              <LockIcon />
             </button>
           )}
           <button
             onClick={() => setHelpOpen(true)}
             className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
-            style={{ ...btnBase, borderBottomLeftRadius: isSecureEnabled ? 0 : '12px', opacity: helpOpen ? 1 : 0.7 }}
+            style={{ ...btnBase, borderBottomLeftRadius: '12px', opacity: helpOpen ? 1 : 0.7 }}
           >
             <HelpIcon />
           </button>
@@ -188,6 +201,7 @@ export default function App() {
         onChangePassword={() => secureOps.open(SECURE_INTENT.CHANGE_VERIFY)}
         onExport={handleExport}
         onImportFile={secureOps.handleImportFile}
+        onReset={() => { setSettingsOpen(false); setResetOpen(true) }}
       />
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
@@ -217,6 +231,7 @@ export default function App() {
             onChange={changeBlock}
             onDelete={deleteBlock}
             onColorChange={changeBlockAndColors}
+            readOnly={isSecureEnabled && secureMode.isLocked}
           />
         ) : (
           <ListView
@@ -228,6 +243,7 @@ export default function App() {
             onDelete={deleteBlock}
             onColorChange={changeBlockAndColors}
             onReorder={reorderBlocks}
+            readOnly={isSecureEnabled && secureMode.isLocked}
           />
         )}
       </div>
@@ -244,6 +260,17 @@ export default function App() {
             hasSecure={!!secureOps.pendingImport.secure?.enabled}
             onConfirm={secureOps.handleImportConfirm}
             onCancel={() => secureOps.setPendingImport(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {resetOpen && (
+          <ResetModal
+            secureEnabled={isSecureEnabled}
+            onBackup={handleExport}
+            onReset={handleReset}
+            onCancel={() => setResetOpen(false)}
           />
         )}
       </AnimatePresence>

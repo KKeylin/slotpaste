@@ -22,9 +22,10 @@ interface Props {
   onResizeEnd?: (block: BlockType) => void
   dragHandleProps?: React.HTMLAttributes<HTMLDivElement>
   onWiggleChange?: (wiggling: boolean) => void
+  readOnly?: boolean
 }
 
-export default function Block({ block, appearance, scale = 1, onCopy, onChange, onColorChange, onDelete, onResizeEnd, dragHandleProps, onWiggleChange }: Props) {
+export default function Block({ block, appearance, scale = 1, onCopy, onChange, onColorChange, onDelete, onResizeEnd, dragHandleProps, onWiggleChange, readOnly }: Props) {
   const {
     containerRef, innerRef,
     editOpen, savedBlock, blockRect, wiggling, confirmOpen, setConfirmOpen,
@@ -40,10 +41,10 @@ export default function Block({ block, appearance, scale = 1, onCopy, onChange, 
         ref={containerRef}
         className="relative"
         style={{ width: block.width ? block.width + 'px' : 'fit-content', maxWidth: '100%', transition: 'none' }}
-        onPointerDown={startLongPress}
-        onPointerMove={handlePointerMove}
-        onPointerUp={cancelLongPress}
-        onPointerLeave={cancelLongPress}
+        onPointerDown={readOnly ? undefined : startLongPress}
+        onPointerMove={readOnly ? undefined : handlePointerMove}
+        onPointerUp={readOnly ? undefined : cancelLongPress}
+        onPointerLeave={readOnly ? undefined : cancelLongPress}
         onClickCapture={handleSuppressClick}
       >
         <motion.div
@@ -95,16 +96,18 @@ export default function Block({ block, appearance, scale = 1, onCopy, onChange, 
             </div>
           </div>
 
-          <button
-            data-no-copy
-            onClick={(e) => { e.stopPropagation(); openEdit() }}
-            className="mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium tracking-wide transition-all opacity-30 hover:opacity-100"
-            style={{ color: canvasTextColor }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = canvasMutedColor)}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-          >
-            EDIT
-          </button>
+          {!readOnly && (
+            <button
+              data-no-copy
+              onClick={(e) => { e.stopPropagation(); openEdit() }}
+              className="mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium tracking-wide transition-all opacity-30 hover:opacity-100"
+              style={{ color: canvasTextColor }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = canvasMutedColor)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              EDIT
+            </button>
+          )}
         </motion.div>
 
         {wiggling && (

@@ -5,9 +5,18 @@ import ColorSwatches from '../ColorSwatches'
 interface Props {
   appearance: Appearance
   onAdd: (text: string, color?: string) => void
+  readOnly?: boolean
 }
 
-export default function AddBlock({ appearance, onAdd }: Props) {
+export default function AddBlock({ appearance, onAdd, readOnly }: Props) {
+  if (readOnly) return (
+    <div
+      className="flex items-center justify-center px-3"
+      style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))', paddingTop: '8px' }}
+    >
+      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>Unlock to add or edit blocks</p>
+    </div>
+  )
   const {
     text, setText,
     color, activeColor, hasCustomColor, inputTextColor,
