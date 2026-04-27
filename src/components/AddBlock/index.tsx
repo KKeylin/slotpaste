@@ -41,6 +41,7 @@ export default function AddBlock({ appearance, onAdd, readOnly }: Props) {
       <div className="flex gap-2 items-end">
         <textarea
           ref={textareaRef}
+          data-add-block
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}

@@ -5,6 +5,7 @@ import { useToast } from './hooks/useToast'
 import { useClipboard } from './hooks/useClipboard'
 import { useSecureMode } from './hooks/useSecureMode'
 import { useSecureOperations } from './hooks/useSecureOperations'
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import TabBar from './components/TabBar'
 import BlockList from './components/BlockList'
 import ListView from './components/ListView'
@@ -32,6 +33,21 @@ export default function App() {
 
   const secureMode = useSecureMode(state.secure)
   const secureOps = useSecureOperations({ state, updateState, secureMode, showToast })
+
+  useKeyboardShortcuts({
+    onFocusAdd: () => document.querySelector<HTMLTextAreaElement>('[data-add-block]')?.focus(),
+    onPrevTab: () => {
+      const idx = state.tabs.findIndex((t) => t.id === state.activeTabId)
+      patchState({ activeTabId: state.tabs[(idx - 1 + state.tabs.length) % state.tabs.length].id })
+    },
+    onNextTab: () => {
+      const idx = state.tabs.findIndex((t) => t.id === state.activeTabId)
+      patchState({ activeTabId: state.tabs[(idx + 1) % state.tabs.length].id })
+    },
+    onSwitchTab: (index) => {
+      if (state.tabs[index]) patchState({ activeTabId: state.tabs[index].id })
+    },
+  })
 
   const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
   const isSecureEnabled = !!state.secure?.enabled
