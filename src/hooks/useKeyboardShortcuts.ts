@@ -1,4 +1,27 @@
 import { useEffect, useRef } from 'react'
+import type { KeyShortcut } from '../types'
+
+export const DEFAULT_LOCK_SHORTCUT: KeyShortcut = { key: 'l', alt: true, ctrl: false, meta: false, shift: false }
+
+export function formatShortcut({ key, alt, ctrl, meta, shift }: KeyShortcut): string {
+  const parts: string[] = []
+  if (ctrl) parts.push('Ctrl')
+  if (meta) parts.push('⌘')
+  if (alt) parts.push('Alt')
+  if (shift) parts.push('Shift')
+  parts.push(key.length === 1 ? key.toUpperCase() : key)
+  return parts.join('+')
+}
+
+function matchesShortcut(e: KeyboardEvent, s: KeyShortcut): boolean {
+  return (
+    e.key === s.key &&
+    e.altKey === s.alt &&
+    e.ctrlKey === s.ctrl &&
+    e.metaKey === s.meta &&
+    e.shiftKey === s.shift
+  )
+}
 
 interface Callbacks {
   onFocusAdd: () => void
@@ -6,6 +29,7 @@ interface Callbacks {
   onNextTab: () => void
   onSwitchTab: (index: number) => void
   onLock?: () => void
+  lockShortcut?: KeyShortcut
 }
 
 export function useKeyboardShortcuts(callbacks: Callbacks) {
@@ -14,14 +38,19 @@ export function useKeyboardShortcuts(callbacks: Callbacks) {
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
       const tag = (document.activeElement?.tagName ?? '').toLowerCase()
       if (tag === 'input' || tag === 'textarea') return
 
-      if (e.key === 'l' || e.key === 'L') {
+      const shortcut = ref.current.lockShortcut ?? DEFAULT_LOCK_SHORTCUT
+      if (ref.current.onLock && matchesShortcut(e, shortcut)) {
         e.preventDefault()
-        ref.current.onLock?.()
-      } else if (e.key === 'n' || e.key === 'N') {
+        ref.current.onLock()
+        return
+      }
+
+      if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
+
+      if (e.key === 'n' || e.key === 'N') {
         e.preventDefault()
         ref.current.onFocusAdd()
       } else if (e.key === 'ArrowLeft') {

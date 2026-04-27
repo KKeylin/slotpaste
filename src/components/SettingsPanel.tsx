@@ -2,8 +2,50 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import colorWheelImg from '../assets/color-wheel-2.png'
-import type { Appearance } from '../types'
+import type { Appearance, KeyShortcut } from '../types'
 import { VERSION } from '../constants'
+import { formatShortcut } from '../hooks/useKeyboardShortcuts'
+
+function ShortcutCapture({ shortcut, onChange }: { shortcut: KeyShortcut; onChange: (s: KeyShortcut) => void }) {
+  const [recording, setRecording] = useState(false)
+  const btnRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!recording) return
+    function onKey(e: KeyboardEvent) {
+      e.preventDefault()
+      if (e.key === 'Escape') { setRecording(false); return }
+      if (['Alt', 'Control', 'Meta', 'Shift'].includes(e.key)) return
+      onChange({ key: e.key, alt: e.altKey, ctrl: e.ctrlKey, meta: e.metaKey, shift: e.shiftKey })
+      setRecording(false)
+    }
+    function onPointer(e: PointerEvent) {
+      if (!btnRef.current?.contains(e.target as Node)) setRecording(false)
+    }
+    window.addEventListener('keydown', onKey, true)
+    document.addEventListener('pointerdown', onPointer)
+    return () => {
+      window.removeEventListener('keydown', onKey, true)
+      document.removeEventListener('pointerdown', onPointer)
+    }
+  }, [recording, onChange])
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={() => setRecording(true)}
+      className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-opacity hover:opacity-80"
+      style={{
+        backgroundColor: recording ? 'rgba(29,158,117,0.15)' : 'rgba(255,255,255,0.06)',
+        color: recording ? '#1D9E75' : 'rgba(255,255,255,0.5)',
+        border: `1px solid ${recording ? 'rgba(29,158,117,0.3)' : 'transparent'}`,
+        minWidth: 72,
+      }}
+    >
+      {recording ? 'Press key…' : formatShortcut(shortcut)}
+    </button>
+  )
+}
 
 interface Props {
   isOpen: boolean
@@ -18,6 +60,8 @@ interface Props {
   onExport: () => void
   onImportFile: (file: File) => void
   onReset: () => void
+  lockShortcut: KeyShortcut
+  onLockShortcutChange: (s: KeyShortcut) => void
 }
 
 interface ColorRowProps {
@@ -68,7 +112,7 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
   )
 }
 
-export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile, onReset }: Props) {
+export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile, onReset, lockShortcut, onLockShortcutChange }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
@@ -178,6 +222,12 @@ export default function SettingsPanel({ isOpen, appearance, secureEnabled, secur
               >
                 Change password
               </button>
+            )}
+            {secureEnabled && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Lock shortcut</span>
+                <ShortcutCapture shortcut={lockShortcut} onChange={onLockShortcutChange} />
+              </div>
             )}
           </div>
 

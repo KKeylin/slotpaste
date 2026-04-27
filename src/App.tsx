@@ -5,7 +5,7 @@ import { useToast } from './hooks/useToast'
 import { useClipboard } from './hooks/useClipboard'
 import { useSecureMode } from './hooks/useSecureMode'
 import { useSecureOperations } from './hooks/useSecureOperations'
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import { useKeyboardShortcuts, DEFAULT_LOCK_SHORTCUT } from './hooks/useKeyboardShortcuts'
 import TabBar from './components/TabBar'
 import BlockList from './components/BlockList'
 import ListView from './components/ListView'
@@ -16,7 +16,7 @@ import SecureModal from './components/SecureModal'
 import ImportConfirmModal from './components/ImportConfirmModal'
 import ResetModal from './components/ResetModal'
 import { LockIcon, HelpIcon, SettingsIcon } from './components/icons'
-import type { AppState, Block, Tab } from './types'
+import type { AppState, Block, Tab, KeyShortcut } from './types'
 import { nanoid } from './utils/nanoid'
 import { findFreePosition } from './utils/collision'
 import { isColorDark } from './utils/color'
@@ -50,6 +50,7 @@ export default function App() {
     onLock: () => {
       if (isSecureEnabled && !secureMode.isLocked) secureMode.lock()
     },
+    lockShortcut: state.preferences?.lockShortcut ?? DEFAULT_LOCK_SHORTCUT,
   })
 
   const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
@@ -221,6 +222,8 @@ export default function App() {
         onExport={handleExport}
         onImportFile={secureOps.handleImportFile}
         onReset={() => { setSettingsOpen(false); setResetOpen(true) }}
+        lockShortcut={state.preferences?.lockShortcut ?? DEFAULT_LOCK_SHORTCUT}
+        onLockShortcutChange={(s: KeyShortcut) => patchState({ preferences: { ...state.preferences, lockShortcut: s } })}
       />
 
       <div className="relative flex-1 flex flex-col overflow-hidden">

@@ -26,10 +26,22 @@ export interface Appearance {
   recentColors: string[]
 }
 
+export interface KeyShortcut {
+  key: string
+  alt: boolean
+  ctrl: boolean
+  meta: boolean
+  shift: boolean
+}
+
 export interface SecureConfig {
   enabled: boolean
   salt: string
   verifyToken: string
+}
+
+export interface Preferences {
+  lockShortcut?: KeyShortcut
 }
 
 export interface AppState {
@@ -37,4 +49,5 @@ export interface AppState {
   activeTabId: string
   appearance: Appearance
   secure?: SecureConfig
+  preferences?: Preferences
 }
