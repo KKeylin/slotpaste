@@ -34,7 +34,8 @@ slotpaste/
 ├── src/
 │   ├── App.tsx              # root component: all state, handlers, layout
 │   ├── main.tsx             # entry point
-│   ├── constants.ts         # CANVAS_SIZE, LONG_PRESS_MS, BLOCK_DEFAULT_W/H, EDIT_OVERHANG, VERSION
+│   ├── constants.ts         # numeric/primitive app-wide constants: CANVAS_SIZE, LONG_PRESS_MS, BLOCK_DEFAULT_W/H, EDIT_OVERHANG, VERSION
+│   ├── enums.ts             # string-literal map constants: SECURE_INTENT (and future enum-like objects)
 │   ├── components/
 │   │   ├── TabBar/              # tabs + DnD sort (hooks.ts + index.tsx)
 │   │   ├── BlockList/           # canvas mode: pan/zoom/blocks (hooks.ts + index.tsx)
@@ -50,10 +51,11 @@ slotpaste/
 │   │   ├── SecureModal.tsx      # Secure Mode modal (unlock/enable/disable/change)
 │   │   └── ImportConfirmModal.tsx  # import warning (replace-all confirmation)
 │   ├── hooks/
-│   │   ├── useStore.ts       # localStorage persistence (debounced 400ms)
-│   │   ├── useSecureMode.ts  # Secure Mode: unlock/lock/encrypt/decrypt/mask
-│   │   ├── useClipboard.ts   # navigator.clipboard.writeText
-│   │   └── useToast.ts       # toast state
+│   │   ├── useStore.ts              # localStorage persistence (debounced 400ms)
+│   │   ├── useSecureMode.ts         # Secure Mode low-level: unlock/lock/encrypt/decrypt/mask
+│   │   ├── useSecureOperations.ts   # Secure Mode orchestration: all intents, import flow, state
+│   │   ├── useClipboard.ts          # navigator.clipboard.writeText
+│   │   └── useToast.ts              # toast state
 │   ├── types/
 │   │   └── index.ts          # FontSize, Block, Tab, Appearance, SecureConfig, AppState
 │   ├── utils/
