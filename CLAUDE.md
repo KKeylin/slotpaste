@@ -1,6 +1,6 @@
 # SlotPaste — CLAUDE.md
 
-> **On every session start**: read `.claude/instructions.md` and follow its rules throughout the session.
+> **On every session start**: read `.claude/instructions.md` and `.gitignore`, follow their rules throughout the session.
 
 ## Collaboration rules (summary from instructions.md)
 
@@ -11,6 +11,7 @@
 - **No unsolicited changes** — only what the current step requires; no refactoring "while we're here"
 - **Update roadmap before each commit** — mark completed items in `.claude/roadmap.md`, sync with `README.md`
 - **Settled decisions stay settled** — everything in "Architectural decisions" below is closed
+- **Disagree → execute → flag** — execute the instruction first, then post a 🟣-marked disagreement note explaining what and why
 
 ## Project overview
 
