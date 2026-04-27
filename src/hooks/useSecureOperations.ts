@@ -85,10 +85,13 @@ export function useSecureOperations({ state, updateState, secureMode, showToast 
         if (!ok) { setError('Wrong password'); setLoading(false); return }
         const decryptedTabs = await Promise.all(state.tabs.map(async tab => ({
           ...tab,
-          blocks: await Promise.all(tab.blocks.map(async b => ({
-            ...b,
-            text: await decryptText(b.text, key),
-          }))),
+          blocks: await Promise.all(tab.blocks.map(async b => {
+            try {
+              return { ...b, text: await decryptText(b.text, key) }
+            } catch {
+              return b
+            }
+          })),
         })))
         secureMode.lock()
         updateState({ ...state, tabs: decryptedTabs, secure: undefined })
