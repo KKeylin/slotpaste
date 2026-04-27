@@ -24,6 +24,14 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     }
   }
 
+  function animateTo(transform: string, duration = '0.45s') {
+    const el = canvasRef.current
+    if (!el) return
+    el.style.transition = `transform ${duration} cubic-bezier(0.25, 0.46, 0.45, 0.94)`
+    el.style.transform = transform
+    el.addEventListener('transitionend', () => { el.style.transition = '' }, { once: true })
+  }
+
   function panToPoint(canvasX: number, canvasY: number) {
     if (!containerRef.current || !canvasRef.current) return
     const { width, height } = containerRef.current.getBoundingClientRect()
@@ -32,12 +40,8 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
       y: height / 2 - canvasY * scaleRef.current,
     }
     panRef.current = newPan
-    canvasRef.current.style.transition = 'transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    canvasRef.current.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(${scaleRef.current})`
+    animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(${scaleRef.current})`)
     setPan({ ...newPan })
-    canvasRef.current.addEventListener('transitionend', () => {
-      if (canvasRef.current) canvasRef.current.style.transition = ''
-    }, { once: true })
   }
 
   useEffect(() => {
@@ -123,13 +127,9 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     const newPan = { x: width / 2 - CANVAS_SIZE / 2, y: height / 2 - CANVAS_SIZE / 2 }
     panRef.current = newPan
     scaleRef.current = 1
-    canvasRef.current.style.transition = 'transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    canvasRef.current.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(1)`
+    animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(1)`)
     setPan({ ...newPan })
     setScale(1)
-    canvasRef.current.addEventListener('transitionend', () => {
-      if (canvasRef.current) canvasRef.current.style.transition = ''
-    }, { once: true })
   }
 
   function resetZoom() {
@@ -143,13 +143,9 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     }
     panRef.current = newPan
     scaleRef.current = 1
-    canvasRef.current.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    canvasRef.current.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(1)`
+    animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(1)`, '0.3s')
     setPan({ ...newPan })
     setScale(1)
-    canvasRef.current.addEventListener('transitionend', () => {
-      if (canvasRef.current) canvasRef.current.style.transition = ''
-    }, { once: true })
   }
 
   return {
