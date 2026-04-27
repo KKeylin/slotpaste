@@ -47,6 +47,9 @@ export default function App() {
     onSwitchTab: (index) => {
       if (state.tabs[index]) patchState({ activeTabId: state.tabs[index].id })
     },
+    onLock: () => {
+      if (isSecureEnabled && !secureMode.isLocked) secureMode.lock()
+    },
   })
 
   const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
