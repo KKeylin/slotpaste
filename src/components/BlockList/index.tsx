@@ -14,9 +14,10 @@ interface Props {
   onChange: (block: BlockType) => void
   onColorChange: (block: BlockType, recentColors: string[]) => void
   onDelete: (id: string) => void
+  readOnly?: boolean
 }
 
-export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete }: Props) {
+export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
@@ -57,6 +58,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
                 onDelete={onDelete}
                 onResizeEnd={handleResizeEnd}
                 onSizeReport={handleSizeReport}
+                readOnly={readOnly}
               />
             ))}
 
@@ -95,7 +97,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
           </button>
         </div>
       </div>
-      <AddBlock appearance={appearance} onAdd={onAdd} />
+      <AddBlock appearance={appearance} onAdd={onAdd} readOnly={readOnly} />
     </div>
   )
 }

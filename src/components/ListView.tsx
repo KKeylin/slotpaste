@@ -12,9 +12,10 @@ interface SortableBlockProps {
   onChange: (block: BlockType) => void
   onColorChange: (block: BlockType, recentColors: string[]) => void
   onDelete: (id: string) => void
+  readOnly?: boolean
 }
 
-function SortableBlock({ block, appearance, onCopy, onChange, onColorChange, onDelete }: SortableBlockProps) {
+function SortableBlock({ block, appearance, onCopy, onChange, onColorChange, onDelete, readOnly }: SortableBlockProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id })
 
   return (
@@ -34,6 +35,7 @@ function SortableBlock({ block, appearance, onCopy, onChange, onColorChange, onD
         onColorChange={onColorChange}
         onDelete={onDelete}
         dragHandleProps={{ ...attributes, ...listeners }}
+        readOnly={readOnly}
       />
     </div>
   )
@@ -48,9 +50,10 @@ interface Props {
   onColorChange: (block: BlockType, recentColors: string[]) => void
   onDelete: (id: string) => void
   onReorder: (blocks: BlockType[]) => void
+  readOnly?: boolean
 }
 
-export default function ListView({ blocks, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, onReorder }: Props) {
+export default function ListView({ blocks, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, onReorder, readOnly }: Props) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
 
   function handleDragEnd(event: DragEndEvent) {
@@ -75,6 +78,7 @@ export default function ListView({ blocks, appearance, onCopy, onAdd, onChange, 
                 onChange={onChange}
                 onColorChange={onColorChange}
                 onDelete={onDelete}
+                readOnly={readOnly}
               />
             ))}
           </SortableContext>
@@ -87,7 +91,7 @@ export default function ListView({ blocks, appearance, onCopy, onAdd, onChange, 
         )}
       </div>
 
-      <AddBlock appearance={appearance} onAdd={onAdd} />
+      <AddBlock appearance={appearance} onAdd={onAdd} readOnly={readOnly} />
     </div>
   )
 }

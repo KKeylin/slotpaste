@@ -17,8 +17,8 @@ function PasswordCells({ value, onChange, onSubmit, shaking, autoFocus }: CellsP
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (autoFocus) setTimeout(() => inputRef.current?.focus(), 80)
-  }, [autoFocus])
+    if (autoFocus) inputRef.current?.focus()
+  }, [])
 
   const cellCount = value.length < MAX_LENGTH
     ? Math.max(8, value.length + 1)

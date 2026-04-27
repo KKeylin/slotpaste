@@ -17,6 +17,7 @@ interface Props {
   onChangePassword: () => void
   onExport: () => void
   onImportFile: (file: File) => void
+  onReset: () => void
 }
 
 interface ColorRowProps {
@@ -67,7 +68,7 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
   )
 }
 
-export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile }: Props) {
+export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile, onReset }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
@@ -213,6 +214,13 @@ export default function SettingsPanel({ isOpen, appearance, secureEnabled, secur
                 Import JSON
               </button>
             </div>
+            <button
+              onClick={onReset}
+              className="py-1.5 rounded-xl text-[10px] font-medium transition-opacity hover:opacity-80"
+              style={{ backgroundColor: 'rgba(226,75,74,0.12)', color: '#E24B4A' }}
+            >
+              Reset all data
+            </button>
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />

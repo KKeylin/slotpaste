@@ -16,6 +16,7 @@ interface Props {
   onDelete: (id: string) => void
   onResizeEnd?: (block: BlockType) => void
   onSizeReport?: (id: string, w: number, h: number) => void
+  readOnly?: boolean
 }
 
 export default function DraggableBlock({ block, position, scale = 1, snapping = false, onSizeReport, ...rest }: Props) {
