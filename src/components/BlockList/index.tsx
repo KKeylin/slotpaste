@@ -22,7 +22,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
 
-  const { containerRef, canvasRef, pan, scale, scaleRef, resetView, resetZoom, pointerHandlers } =
+  const { containerRef, canvasRef, pan, scale, scaleRef, resetView, resetZoom, pointerHandlers, touchHandlers } =
     useCanvas(blocks, activeTabId)
 
   const { snappingIds, handleSizeReport, handleResizeEnd, handleDragEnd } =
@@ -30,7 +30,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div ref={containerRef} className="relative flex-1 overflow-hidden" style={{ touchAction: 'none' }}>
+      <div ref={containerRef} className="relative flex-1 overflow-hidden" style={{ touchAction: 'none' }} {...touchHandlers}>
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <div
             ref={canvasRef}
