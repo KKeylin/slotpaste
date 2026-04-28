@@ -277,8 +277,12 @@ export default function App() {
               onClick={() => patchTab(activeTab.id, { viewMode: mode })}
               className="px-4 py-3 text-[10px] font-medium tracking-wide transition-colors"
               style={{
-                backgroundColor: activeTab.viewMode === mode ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.03)',
-                color: activeTab.viewMode === mode ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.25)',
+                backgroundColor: activeTab.viewMode === mode
+                  ? (isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)')
+                  : (isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'),
+                color: activeTab.viewMode === mode
+                  ? (isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.75)')
+                  : (isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.3)'),
               }}
             >
               {mode === 'canvas' ? 'Canvas' : 'List'}

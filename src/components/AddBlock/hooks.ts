@@ -12,7 +12,7 @@ export function useAddBlock(appearance: Appearance, onAdd: (text: string, color?
   const dark = isColorDark(activeColor)
   const inputTextColor = hasCustomColor
     ? (dark ? 'rgba(255,255,255,0.87)' : 'rgba(0,0,0,0.87)')
-    : 'rgba(255,255,255,0.87)'
+    : (isColorDark(appearance.bgColor) ? 'rgba(255,255,255,0.87)' : 'rgba(0,0,0,0.87)')
 
   const swatchColors = [
     appearance.blockColor,

@@ -4,6 +4,7 @@ import DraggableBlock from '../DraggableBlock'
 import AddBlock from '../AddBlock'
 import { useCanvas, useBlockSnap } from './hooks'
 import { CANVAS_SIZE } from '../../constants'
+import { isColorDark } from '../../utils/color'
 
 interface Props {
   blocks: BlockType[]
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly, collisionPrevention }: Props) {
+  const isDark = isColorDark(appearance.bgColor)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
@@ -69,7 +71,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
                 style={{
                   left: CANVAS_SIZE / 2 - 50,
                   top: CANVAS_SIZE / 2 - 8,
-                  color: 'rgba(255,255,255,0.15)',
+                  color: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.2)',
                 }}
               >
                 No blocks yet
@@ -85,14 +87,14 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
           <button
             onClick={resetZoom}
             className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80 tabular-nums"
-            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', border: `1px solid ${appearance.accentColor}` }}
+            style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)', border: `1px solid ${appearance.accentColor}` }}
           >
             {Math.round(scale * 100)}%
           </button>
           <button
             onClick={resetView}
             className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80"
-            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', border: `1px solid ${appearance.accentColor}` }}
+            style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)', border: `1px solid ${appearance.accentColor}` }}
           >
             ⌖ CENTER
           </button>
