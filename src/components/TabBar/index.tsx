@@ -7,11 +7,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { Tab } from '../../types'
 import { LONG_PRESS_MS } from '../../constants'
 import { useTabBar } from './hooks'
+import { isColorDark } from '../../utils/color'
 
 interface SortableTabProps {
   tab: Tab
   active: boolean
   accentColor: string
+  isDark: boolean
   isEditing: boolean
   editingName: string
   wiggling: boolean
@@ -26,7 +28,7 @@ interface SortableTabProps {
 }
 
 function SortableTab({
-  tab, active, accentColor, isEditing, editingName, wiggling, canDelete,
+  tab, active, accentColor, isDark, isEditing, editingName, wiggling, canDelete,
   onSelect, onDoubleClick, onEditChange, onEditBlur, onEditKeyDown,
   onLongPress, onDelete,
 }: SortableTabProps) {
@@ -99,8 +101,8 @@ function SortableTab({
             transform: CSS.Transform.toString(transform),
             transition,
             opacity: isDragging ? 0.5 : 1,
-            backgroundColor: active ? 'rgba(255,255,255,0.12)' : 'transparent',
-            color: active ? 'rgba(255,255,255,0.87)' : 'rgba(255,255,255,0.35)',
+            backgroundColor: active ? (isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)') : 'transparent',
+            color: active ? (isDark ? 'rgba(255,255,255,0.87)' : 'rgba(0,0,0,0.87)') : (isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.4)'),
             border: '1px solid',
             borderColor: active ? accentColor : 'transparent',
           }}
@@ -116,7 +118,7 @@ function SortableTab({
               onClick={(e) => e.stopPropagation()}
               placeholder="New tab"
               className="bg-transparent outline-none w-20 text-xs placeholder:opacity-30"
-              style={{ color: 'rgba(255,255,255,0.87)' }}
+              style={{ color: isDark ? 'rgba(255,255,255,0.87)' : 'rgba(0,0,0,0.87)' }}
             />
           ) : (
             tab.name
@@ -143,6 +145,7 @@ interface Props {
   tabs: Tab[]
   activeTabId: string
   accentColor: string
+  bgColor: string
   onSelect: (id: string) => void
   onAdd: () => void
   onRename: (id: string, name: string) => void
@@ -150,7 +153,8 @@ interface Props {
   onDelete: (id: string) => void
 }
 
-export default function TabBar({ tabs, activeTabId, accentColor, onSelect, onAdd, onRename, onReorder, onDelete }: Props) {
+export default function TabBar({ tabs, activeTabId, accentColor, bgColor, onSelect, onAdd, onRename, onReorder, onDelete }: Props) {
+  const isDark = isColorDark(bgColor)
   const {
     editingId, editingName, setEditingName,
     wigglingId, setWigglingId,
@@ -175,6 +179,7 @@ export default function TabBar({ tabs, activeTabId, accentColor, onSelect, onAdd
                 tab={tab}
                 active={tab.id === activeTabId}
                 accentColor={accentColor}
+                isDark={isDark}
                 isEditing={editingId === tab.id}
                 editingName={editingName}
                 wiggling={wigglingId === tab.id}
@@ -192,7 +197,7 @@ export default function TabBar({ tabs, activeTabId, accentColor, onSelect, onAdd
             <button
               onClick={onAdd}
               className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-opacity hover:opacity-80 ml-1"
-              style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: accentColor }}
+              style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', color: accentColor }}
             >
               <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
                 <path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
