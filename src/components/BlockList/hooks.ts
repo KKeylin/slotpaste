@@ -108,6 +108,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
 
   function handlePointerMove(e: React.PointerEvent) {
     if (!isPanning.current) return
+    if (pinchStartDist.current !== 0) return
     const newPan = {
       x: panStart.current.panX + (e.clientX - panStart.current.mouseX),
       y: panStart.current.panY + (e.clientY - panStart.current.mouseY),
@@ -124,6 +125,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
 
   function handleTouchStart(e: React.TouchEvent) {
     if (e.touches.length === 2) {
+      isPanning.current = false
       const t1 = e.touches[0], t2 = e.touches[1]
       pinchStartDist.current = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
     }
