@@ -47,6 +47,29 @@ function ShortcutCapture({ shortcut, onChange }: { shortcut: KeyShortcut; onChan
   )
 }
 
+function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      onClick={() => onChange(!checked)}
+      className="relative flex-shrink-0 transition-colors"
+      style={{
+        width: 36, height: 20, borderRadius: 10,
+        backgroundColor: checked ? '#1D9E75' : 'rgba(255,255,255,0.12)',
+      }}
+    >
+      <span
+        className="absolute top-0.5 transition-transform"
+        style={{
+          left: 2, width: 16, height: 16, borderRadius: 8,
+          backgroundColor: 'white',
+          transform: checked ? 'translateX(16px)' : 'translateX(0)',
+          display: 'block',
+        }}
+      />
+    </button>
+  )
+}
+
 interface Props {
   isOpen: boolean
   appearance: Appearance
@@ -62,6 +85,8 @@ interface Props {
   onReset: () => void
   shortcuts: ShortcutMap
   onShortcutChange: (key: keyof ShortcutMap, value: KeyShortcut) => void
+  collisionPrevention: boolean
+  onCollisionPreventionChange: (v: boolean) => void
 }
 
 interface ColorRowProps {
@@ -128,7 +153,7 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
   )
 }
 
-export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile, onReset, shortcuts, onShortcutChange }: Props) {
+export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile, onReset, shortcuts, onShortcutChange, collisionPrevention, onCollisionPreventionChange }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
@@ -270,6 +295,18 @@ export default function SettingsPanel({ isOpen, appearance, secureEnabled, secur
                 </div>
               </div>
             ))}
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+
+          <div className="flex flex-col gap-3">
+            <span className="text-[10px] font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Canvas
+            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Collision prevention</span>
+              <Toggle checked={collisionPrevention} onChange={onCollisionPreventionChange} />
+            </div>
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />

@@ -15,9 +15,10 @@ interface Props {
   onColorChange: (block: BlockType, recentColors: string[]) => void
   onDelete: (id: string) => void
   readOnly?: boolean
+  collisionPrevention?: boolean
 }
 
-export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly }: Props) {
+export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly, collisionPrevention }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
@@ -26,7 +27,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
     useCanvas(blocks, activeTabId)
 
   const { snappingIds, handleSizeReport, handleResizeEnd, handleDragEnd } =
-    useBlockSnap(blocks, onChange, scaleRef)
+    useBlockSnap(blocks, onChange, scaleRef, collisionPrevention)
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
@@ -84,14 +85,14 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
           <button
             onClick={resetZoom}
             className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80 tabular-nums"
-            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
+            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', border: `1px solid ${appearance.accentColor}` }}
           >
             {Math.round(scale * 100)}%
           </button>
           <button
             onClick={resetView}
             className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80"
-            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
+            style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', border: `1px solid ${appearance.accentColor}` }}
           >
             ⌖ CENTER
           </button>

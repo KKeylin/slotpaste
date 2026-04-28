@@ -46,6 +46,7 @@ export interface Preferences {
   prevTabShortcut?: KeyShortcut
   nextTabShortcut?: KeyShortcut
   lockShortcut?: KeyShortcut
+  collisionPrevention?: boolean
 }
 
 export interface AppState {
