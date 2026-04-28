@@ -1,6 +1,7 @@
 import type { Appearance } from '../../types'
 import { useAddBlock } from './hooks'
 import ColorSwatches from '../ColorSwatches'
+import { isColorDark } from '../../utils/color'
 
 interface Props {
   appearance: Appearance
@@ -14,7 +15,7 @@ export default function AddBlock({ appearance, onAdd, readOnly }: Props) {
       className="flex items-center justify-center px-3"
       style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))', paddingTop: '8px' }}
     >
-      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>Unlock to add or edit blocks</p>
+      <p className="text-xs" style={{ color: isColorDark(appearance.bgColor) ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.3)' }}>Unlock to add or edit blocks</p>
     </div>
   )
   const {
@@ -49,7 +50,7 @@ export default function AddBlock({ appearance, onAdd, readOnly }: Props) {
           rows={2}
           className="flex-1 resize-none rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-200 placeholder:opacity-30"
           style={{
-            backgroundColor: hasCustomColor ? activeColor : 'rgba(255,255,255,0.06)',
+            backgroundColor: hasCustomColor ? activeColor : (isColorDark(appearance.bgColor) ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'),
             color: inputTextColor,
             border: `1px solid ${appearance.accentColor}`,
           }}
