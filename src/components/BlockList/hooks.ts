@@ -14,6 +14,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
   const isPanning = useRef(false)
   const panStart = useRef({ mouseX: 0, mouseY: 0, panX: 0, panY: 0 })
   const pinchStartDist = useRef(0)
+  const pinchMidpoint = useRef({ x: 0, y: 0 })
   const prevBlockCount = useRef(blocks.length)
 
   panRef.current = pan
@@ -128,6 +129,11 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
       isPanning.current = false
       const t1 = e.touches[0], t2 = e.touches[1]
       pinchStartDist.current = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
+      const rect = containerRef.current!.getBoundingClientRect()
+      pinchMidpoint.current = {
+        x: (t1.clientX + t2.clientX) / 2 - rect.left,
+        y: (t1.clientY + t2.clientY) / 2 - rect.top,
+      }
     }
   }
 
@@ -140,14 +146,17 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     const rect = containerRef.current!.getBoundingClientRect()
     const cx = (t1.clientX + t2.clientX) / 2 - rect.left
     const cy = (t1.clientY + t2.clientY) / 2 - rect.top
+    const prevCx = pinchMidpoint.current.x
+    const prevCy = pinchMidpoint.current.y
     const newPan = {
-      x: cx - (cx - panRef.current.x) * (newScale / scaleRef.current),
-      y: cy - (cy - panRef.current.y) * (newScale / scaleRef.current),
+      x: cx - (prevCx - panRef.current.x) * (newScale / scaleRef.current),
+      y: cy - (prevCy - panRef.current.y) * (newScale / scaleRef.current),
     }
     panRef.current = newPan
     scaleRef.current = newScale
     applyTransform(newPan, newScale)
     pinchStartDist.current = newDist
+    pinchMidpoint.current = { x: cx, y: cy }
   }
 
   function handleTouchEnd() {
