@@ -13,6 +13,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
   const scaleRef = useRef(1)
   const isPanning = useRef(false)
   const panStart = useRef({ mouseX: 0, mouseY: 0, panX: 0, panY: 0 })
+  const pinchStartDist = useRef(0)
   const prevBlockCount = useRef(blocks.length)
 
   panRef.current = pan
@@ -121,6 +122,38 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     setPan({ ...panRef.current })
   }
 
+  function handleTouchStart(e: React.TouchEvent) {
+    if (e.touches.length === 2) {
+      const t1 = e.touches[0], t2 = e.touches[1]
+      pinchStartDist.current = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
+    }
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    if (e.touches.length !== 2 || pinchStartDist.current === 0) return
+    const t1 = e.touches[0], t2 = e.touches[1]
+    const newDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
+    const factor = newDist / pinchStartDist.current
+    const newScale = Math.min(3, Math.max(0.15, scaleRef.current * factor))
+    const rect = containerRef.current!.getBoundingClientRect()
+    const cx = (t1.clientX + t2.clientX) / 2 - rect.left
+    const cy = (t1.clientY + t2.clientY) / 2 - rect.top
+    const newPan = {
+      x: cx - (cx - panRef.current.x) * (newScale / scaleRef.current),
+      y: cy - (cy - panRef.current.y) * (newScale / scaleRef.current),
+    }
+    panRef.current = newPan
+    scaleRef.current = newScale
+    applyTransform(newPan, newScale)
+    pinchStartDist.current = newDist
+    setPan({ ...newPan })
+    setScale(newScale)
+  }
+
+  function handleTouchEnd() {
+    pinchStartDist.current = 0
+  }
+
   function resetView() {
     if (!containerRef.current || !canvasRef.current) return
     const { width, height } = containerRef.current.getBoundingClientRect()
@@ -160,6 +193,11 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
       onPointerDown: handlePointerDown,
       onPointerMove: handlePointerMove,
       onPointerUp: handlePointerUp,
+    },
+    touchHandlers: {
+      onTouchStart: handleTouchStart,
+      onTouchMove: handleTouchMove,
+      onTouchEnd: handleTouchEnd,
     },
   }
 }
