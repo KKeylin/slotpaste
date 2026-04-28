@@ -146,11 +146,13 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     scaleRef.current = newScale
     applyTransform(newPan, newScale)
     pinchStartDist.current = newDist
-    setPan({ ...newPan })
-    setScale(newScale)
   }
 
   function handleTouchEnd() {
+    if (pinchStartDist.current !== 0) {
+      setPan({ ...panRef.current })
+      setScale(scaleRef.current)
+    }
     pinchStartDist.current = 0
   }
 
