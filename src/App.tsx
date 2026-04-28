@@ -210,6 +210,7 @@ export default function App() {
           tabs={state.tabs}
           activeTabId={state.activeTabId}
           accentColor={state.appearance.accentColor}
+          bgColor={state.appearance.bgColor}
           onSelect={(id) => patchState({ activeTabId: id })}
           onAdd={addTab}
           onRename={renameTab}
