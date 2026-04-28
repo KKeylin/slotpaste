@@ -84,6 +84,7 @@ export default function App() {
 
   const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
   const isSecureEnabled = !!state.secure?.enabled
+  const collisionPrevention = state.preferences?.collisionPrevention ?? false
 
   const displayBlocks = useMemo(
     () => (activeTab?.blocks ?? []).map(b => ({ ...b, text: secureMode.getDisplayText(b.id, b.text) })),
@@ -145,7 +146,9 @@ export default function App() {
       const desired = last
         ? { x: last.position?.x ?? 2000, y: (last.position?.y ?? 2000 + (i - 1) * 90) + (last.height ?? 90) + 20 }
         : { x: 2000, y: 2000 }
-      position = findFreePosition(desired, { w: BLOCK_DEFAULT_W, h: BLOCK_DEFAULT_H + EDIT_OVERHANG }, activeTab.blocks)
+      position = collisionPrevention
+        ? findFreePosition(desired, { w: BLOCK_DEFAULT_W, h: BLOCK_DEFAULT_H + EDIT_OVERHANG }, activeTab.blocks)
+        : desired
     }
     const draft: Block = { id, text, fontSize: 'md', ...(position ? { position } : {}), ...(color ? { color } : {}) }
     const block = await maybeEncrypt(draft)
@@ -262,6 +265,8 @@ export default function App() {
         onReset={() => { setSettingsOpen(false); setResetOpen(true) }}
         shortcuts={shortcuts}
         onShortcutChange={handleShortcutChange}
+        collisionPrevention={collisionPrevention}
+        onCollisionPreventionChange={(v) => patchState({ preferences: { ...state.preferences, collisionPrevention: v } })}
       />
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
@@ -292,6 +297,7 @@ export default function App() {
             onDelete={deleteBlock}
             onColorChange={changeBlockAndColors}
             readOnly={isSecureEnabled && secureMode.isLocked}
+            collisionPrevention={collisionPrevention}
           />
         ) : (
           <ListView

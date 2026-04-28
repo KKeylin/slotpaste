@@ -219,6 +219,7 @@ export function useBlockSnap(
   blocks: BlockType[],
   onChange: (block: BlockType) => void,
   scaleRef: React.MutableRefObject<number>,
+  collisionPrevention = false,
 ) {
   const measuredSizes = useRef<Map<string, { w: number; h: number }>>(new Map())
   const [snappingIds, setSnappingIds] = useState<Set<string>>(new Set())
@@ -241,7 +242,7 @@ export function useBlockSnap(
   }
 
   function handleResizeEnd(updated: BlockType) {
-    if (!updated.position) return
+    if (!updated.position || !collisionPrevention) return
     requestAnimationFrame(() => {
       const sz = effectiveSize(updated)
       const freePos = findFreePosition(updated.position!, sz, blocks, updated.id, measuredSizes.current)
@@ -262,9 +263,10 @@ export function useBlockSnap(
       x: Math.max(0, Math.min(CANVAS_SIZE, pos.x + delta.x / scaleRef.current)),
       y: Math.max(0, Math.min(CANVAS_SIZE, pos.y + delta.y / scaleRef.current)),
     }
+    onChange({ ...block, position: rawPos })
+    if (!collisionPrevention) return
     const sz = effectiveSize(block)
     const freePos = findFreePosition(rawPos, sz, blocks, block.id, measuredSizes.current)
-    onChange({ ...block, position: rawPos })
     if (rawPos.x !== freePos.x || rawPos.y !== freePos.y) {
       requestAnimationFrame(() => {
         onChange({ ...block, position: freePos })
