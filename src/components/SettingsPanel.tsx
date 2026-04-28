@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import colorWheelImg from '../assets/color-wheel-2.png'
 import type { Appearance, KeyShortcut } from '../types'
 import { VERSION } from '../constants'
-import { formatShortcut } from '../hooks/useKeyboardShortcuts'
+import { formatShortcut, type ShortcutMap, DEFAULT_SHORTCUTS } from '../hooks/useKeyboardShortcuts'
 
 function ShortcutCapture({ shortcut, onChange }: { shortcut: KeyShortcut; onChange: (s: KeyShortcut) => void }) {
   const [recording, setRecording] = useState(false)
@@ -14,9 +14,9 @@ function ShortcutCapture({ shortcut, onChange }: { shortcut: KeyShortcut; onChan
     if (!recording) return
     function onKey(e: KeyboardEvent) {
       e.preventDefault()
-      if (e.key === 'Escape') { setRecording(false); return }
+      if (e.code === 'Escape') { setRecording(false); return }
       if (['Alt', 'Control', 'Meta', 'Shift'].includes(e.key)) return
-      onChange({ key: e.key, alt: e.altKey, ctrl: e.ctrlKey, meta: e.metaKey, shift: e.shiftKey })
+      onChange({ key: e.code, alt: e.altKey, ctrl: e.ctrlKey, meta: e.metaKey, shift: e.shiftKey })
       setRecording(false)
     }
     function onPointer(e: PointerEvent) {
@@ -60,8 +60,8 @@ interface Props {
   onExport: () => void
   onImportFile: (file: File) => void
   onReset: () => void
-  lockShortcut: KeyShortcut
-  onLockShortcutChange: (s: KeyShortcut) => void
+  shortcuts: ShortcutMap
+  onShortcutChange: (key: keyof ShortcutMap, value: KeyShortcut) => void
 }
 
 interface ColorRowProps {
@@ -72,47 +72,63 @@ interface ColorRowProps {
   onOpacityChange?: (opacity: number) => void
 }
 
+function hexToRgb(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: ColorRowProps) {
+  const [fmt, setFmt] = useState<'hex' | 'rgb'>('hex')
+
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-[10px] font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>
-        {label}
-      </span>
-      <div className="flex items-center gap-3">
-        <label className="w-7 h-7 rounded-full cursor-pointer hover:opacity-80 relative overflow-hidden flex-shrink-0">
-          <img src={colorWheelImg} className="w-full h-full object-cover rounded-full" alt="colorWheel" />
-          <input
-            type="color"
-            value={color}
-            onChange={(e) => onColorChange(e.target.value)}
-            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-          />
-        </label>
-
-        {opacity !== undefined && onOpacityChange && (
-          <>
+      <div className="flex items-center justify-between">
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{label}</span>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setFmt(f => f === 'hex' ? 'rgb' : 'hex')}
+            className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-opacity hover:opacity-80"
+            style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid transparent' }}
+          >
+            {fmt === 'hex' ? color : hexToRgb(color)}
+          </button>
+          <label className="w-6 h-6 rounded-full cursor-pointer hover:opacity-80 relative overflow-hidden flex-shrink-0">
+            <img src={colorWheelImg} className="w-full h-full object-cover rounded-full" alt="colorWheel" />
             <input
-              type="range"
-              min={0}
-              max={100}
-              value={Math.round(opacity * 100)}
-              onChange={(e) => onOpacityChange(Number(e.target.value) / 100)}
-              className="flex-1 h-1 rounded-full appearance-none cursor-pointer accent-white"
-              style={{
-                background: `linear-gradient(to right, rgba(255,255,255,0.7) ${Math.round(opacity * 100)}%, rgba(255,255,255,0.15) ${Math.round(opacity * 100)}%)`,
-              }}
+              type="color"
+              value={color}
+              onChange={(e) => onColorChange(e.target.value)}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             />
-            <span className="text-[11px] w-8 text-right tabular-nums" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {Math.round(opacity * 100)}%
-            </span>
-          </>
-        )}
+          </label>
+        </div>
       </div>
+
+      {opacity !== undefined && onOpacityChange && (
+        <div className="flex items-center gap-2">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round(opacity * 100)}
+            onChange={(e) => onOpacityChange(Number(e.target.value) / 100)}
+            className="flex-1 h-1 rounded-full appearance-none cursor-pointer accent-white"
+            style={{
+              background: `linear-gradient(to right, rgba(255,255,255,0.7) ${Math.round(opacity * 100)}%, rgba(255,255,255,0.15) ${Math.round(opacity * 100)}%)`,
+            }}
+          />
+          <span className="text-[11px] w-8 text-right tabular-nums" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {Math.round(opacity * 100)}%
+          </span>
+        </div>
+      )}
     </div>
   )
 }
 
-export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile, onReset, lockShortcut, onLockShortcutChange }: Props) {
+export default function SettingsPanel({ isOpen, appearance, secureEnabled, secureLocked, onChange, onClose, onEnableSecure, onDisableSecure, onChangePassword, onExport, onImportFile, onReset, shortcuts, onShortcutChange }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
@@ -175,17 +191,17 @@ export default function SettingsPanel({ isOpen, appearance, secureEnabled, secur
           />
 
           <ColorRow
+            label="Accent"
+            color={appearance.accentColor}
+            onColorChange={(accentColor) => onChange({ ...appearance, accentColor })}
+          />
+
+          <ColorRow
             label="Blocks"
             color={appearance.blockColor}
             opacity={appearance.blockOpacity}
             onColorChange={(blockColor) => onChange({ ...appearance, blockColor })}
             onOpacityChange={(blockOpacity) => onChange({ ...appearance, blockOpacity })}
-          />
-
-          <ColorRow
-            label="Accent"
-            color={appearance.accentColor}
-            onColorChange={(accentColor) => onChange({ ...appearance, accentColor })}
           />
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
@@ -223,12 +239,37 @@ export default function SettingsPanel({ isOpen, appearance, secureEnabled, secur
                 Change password
               </button>
             )}
-            {secureEnabled && (
-              <div className="flex items-center justify-between">
-                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Lock shortcut</span>
-                <ShortcutCapture shortcut={lockShortcut} onChange={onLockShortcutChange} />
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+
+          <div className="flex flex-col gap-3">
+            <span className="text-[10px] font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Shortcuts
+            </span>
+            {(Object.entries({
+              focusAdd: 'Focus add',
+              search:   'Search',
+              prevTab:  'Previous tab',
+              nextTab:  'Next tab',
+              lock:     'Lock / Unlock',
+            }) as [keyof ShortcutMap, string][]).map(([key, label]) => (
+              <div key={key} className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{label}</span>
+                <div className="flex items-center gap-1.5">
+                  {shortcuts[key] !== DEFAULT_SHORTCUTS[key] && (
+                    <button
+                      onClick={() => onShortcutChange(key, DEFAULT_SHORTCUTS[key])}
+                      className="text-[9px] transition-opacity hover:opacity-80"
+                      style={{ color: 'rgba(255,255,255,0.2)' }}
+                    >
+                      reset
+                    </button>
+                  )}
+                  <ShortcutCapture shortcut={shortcuts[key]} onChange={v => onShortcutChange(key, v)} />
+                </div>
               </div>
-            )}
+            ))}
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />

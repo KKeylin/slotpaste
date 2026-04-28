@@ -41,6 +41,10 @@ export interface SecureConfig {
 }
 
 export interface Preferences {
+  focusAddShortcut?: KeyShortcut
+  searchShortcut?: KeyShortcut
+  prevTabShortcut?: KeyShortcut
+  nextTabShortcut?: KeyShortcut
   lockShortcut?: KeyShortcut
 }
 

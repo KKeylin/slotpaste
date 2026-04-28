@@ -5,7 +5,7 @@ import { useToast } from './hooks/useToast'
 import { useClipboard } from './hooks/useClipboard'
 import { useSecureMode } from './hooks/useSecureMode'
 import { useSecureOperations } from './hooks/useSecureOperations'
-import { useKeyboardShortcuts, DEFAULT_LOCK_SHORTCUT } from './hooks/useKeyboardShortcuts'
+import { useKeyboardShortcuts, DEFAULT_SHORTCUTS, type ShortcutMap } from './hooks/useKeyboardShortcuts'
 import TabBar from './components/TabBar'
 import BlockList from './components/BlockList'
 import ListView from './components/ListView'
@@ -15,8 +15,10 @@ import OnboardingModal from './components/OnboardingModal'
 import SecureModal from './components/SecureModal'
 import ImportConfirmModal from './components/ImportConfirmModal'
 import ResetModal from './components/ResetModal'
+import SearchBar from './components/SearchBar'
+import type { SearchBlock } from './components/SearchModal'
 import { LockIcon, HelpIcon, SettingsIcon } from './components/icons'
-import type { AppState, Block, Tab, KeyShortcut } from './types'
+import type { AppState, Block, Tab } from './types'
 import { nanoid } from './utils/nanoid'
 import { findFreePosition } from './utils/collision'
 import { isColorDark } from './utils/color'
@@ -48,10 +50,37 @@ export default function App() {
       if (state.tabs[index]) patchState({ activeTabId: state.tabs[index].id })
     },
     onLock: () => {
-      if (isSecureEnabled && !secureMode.isLocked) secureMode.lock()
+      if (!isSecureEnabled) return
+      if (secureMode.isLocked) secureOps.open(SECURE_INTENT.UNLOCK)
+      else secureMode.lock()
     },
-    lockShortcut: state.preferences?.lockShortcut ?? DEFAULT_LOCK_SHORTCUT,
+    shortcuts: {
+      focusAdd: state.preferences?.focusAddShortcut ?? DEFAULT_SHORTCUTS.focusAdd,
+      search:   state.preferences?.searchShortcut   ?? DEFAULT_SHORTCUTS.search,
+      prevTab:  state.preferences?.prevTabShortcut  ?? DEFAULT_SHORTCUTS.prevTab,
+      nextTab:  state.preferences?.nextTabShortcut  ?? DEFAULT_SHORTCUTS.nextTab,
+      lock:     state.preferences?.lockShortcut     ?? DEFAULT_SHORTCUTS.lock,
+    },
   })
+
+  const shortcuts: ShortcutMap = {
+    focusAdd: state.preferences?.focusAddShortcut ?? DEFAULT_SHORTCUTS.focusAdd,
+    search:   state.preferences?.searchShortcut   ?? DEFAULT_SHORTCUTS.search,
+    prevTab:  state.preferences?.prevTabShortcut  ?? DEFAULT_SHORTCUTS.prevTab,
+    nextTab:  state.preferences?.nextTabShortcut  ?? DEFAULT_SHORTCUTS.nextTab,
+    lock:     state.preferences?.lockShortcut     ?? DEFAULT_SHORTCUTS.lock,
+  }
+
+  function handleShortcutChange(key: keyof ShortcutMap, value: ShortcutMap[keyof ShortcutMap]) {
+    const prefKey: Record<keyof ShortcutMap, string> = {
+      focusAdd: 'focusAddShortcut',
+      search:   'searchShortcut',
+      prevTab:  'prevTabShortcut',
+      nextTab:  'nextTabShortcut',
+      lock:     'lockShortcut',
+    }
+    patchState({ preferences: { ...state.preferences, [prefKey[key]]: value } })
+  }
 
   const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
   const isSecureEnabled = !!state.secure?.enabled
@@ -60,6 +89,14 @@ export default function App() {
     () => (activeTab?.blocks ?? []).map(b => ({ ...b, text: secureMode.getDisplayText(b.id, b.text) })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [activeTab?.blocks, secureMode.isLocked, secureMode.decryptedTexts]
+  )
+
+  const searchBlocks = useMemo<SearchBlock[]>(
+    () => state.tabs.flatMap(tab =>
+      tab.blocks.map(b => ({ id: b.id, text: secureMode.getDisplayText(b.id, b.text), tabName: tab.name }))
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.tabs, secureMode.isLocked, secureMode.decryptedTexts]
   )
 
   function closeHelp() {
@@ -176,7 +213,8 @@ export default function App() {
           onReorder={reorderTabs}
           onDelete={deleteTab}
         />
-        <div className="absolute top-0 right-0 flex">
+        <div className="absolute top-0 right-0 flex items-center">
+          <SearchBar blocks={searchBlocks} onCopy={copy} buttonStyle={btnBase} shortcut={shortcuts.search} />
           {isSecureEnabled && (
             <button
               onClick={() => secureMode.isLocked ? secureOps.open(SECURE_INTENT.UNLOCK) : secureMode.lock()}
@@ -222,8 +260,8 @@ export default function App() {
         onExport={handleExport}
         onImportFile={secureOps.handleImportFile}
         onReset={() => { setSettingsOpen(false); setResetOpen(true) }}
-        lockShortcut={state.preferences?.lockShortcut ?? DEFAULT_LOCK_SHORTCUT}
-        onLockShortcutChange={(s: KeyShortcut) => patchState({ preferences: { ...state.preferences, lockShortcut: s } })}
+        shortcuts={shortcuts}
+        onShortcutChange={handleShortcutChange}
       />
 
       <div className="relative flex-1 flex flex-col overflow-hidden">
@@ -296,6 +334,7 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
 
       <AnimatePresence>
         {secureOps.intent && (

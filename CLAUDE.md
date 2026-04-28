@@ -46,6 +46,8 @@ slotpaste/
 │   │   ├── EditPopup.tsx        # edit popup (portal)
 │   │   ├── ColorSwatches.tsx    # color swatches + color wheel
 │   │   ├── ListView.tsx         # list mode with DnD reorder
+│   │   ├── SearchBar.tsx        # compact search input in header; dropdown results via portal
+│   │   ├── SearchModal.tsx      # command-palette search modal (SearchBlock interface, reusable)
 │   │   ├── SettingsPanel.tsx    # settings panel (bottom sheet on mobile)
 │   │   ├── Toast.tsx            # toast notification
 │   │   ├── OnboardingModal.tsx  # 4-slide onboarding (? button, auto-show on first visit)
@@ -55,6 +57,7 @@ slotpaste/
 │   │   ├── useStore.ts              # localStorage persistence (debounced 400ms)
 │   │   ├── useSecureMode.ts         # Secure Mode low-level: unlock/lock/encrypt/decrypt/mask
 │   │   ├── useSecureOperations.ts   # Secure Mode orchestration: all intents, import flow, state
+│   │   ├── useKeyboardShortcuts.ts  # configurable shortcuts: ShortcutMap, DEFAULT_SHORTCUTS, formatShortcut, e.code-based matching
 │   │   ├── useClipboard.ts          # navigator.clipboard.writeText
 │   │   └── useToast.ts              # toast state
 │   ├── types/

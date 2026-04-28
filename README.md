@@ -32,12 +32,37 @@ Some text you type over and over. SlotPaste keeps those snippets one click away,
 **List Mode**
 - Vertical scrollable list with drag-to-reorder
 
+**Search**
+- Compact search bar in the header — type to get instant results from all tabs
+- Keyboard navigation (↑↓), Enter to copy, Esc to close
+- Highlights matched text, shows source tab name per result
+
+**Secure Mode**
+- AES-256-GCM encryption + PBKDF2 key derivation (native Web Crypto API)
+- Lock / unlock via button or configurable keyboard shortcut (default `Alt+L`)
+- Auto-locks on tab close; read-only while locked
+- Change password, resilient unlock on mixed-state data
+
+**Keyboard shortcuts**
+
+All shortcuts are configurable in Settings. Defaults:
+
+| Shortcut | Action |
+|---|---|
+| `Alt+F` | Focus search |
+| `Alt+N` | Focus "add block" input |
+| `Alt+←` / `Alt+→` | Previous / next tab |
+| `Alt+1–9` | Switch to tab by number |
+| `Alt+L` | Lock / unlock |
+
 **Appearance**
-- Background color, block color + opacity, accent color (borders, icons)
+- Background color, accent color, block color + opacity
+- Color values shown as hex or RGB (click to toggle)
 
 **Data**
 - Export all data to JSON (includes encrypted content as-is if Secure Mode is on)
 - Import JSON with replace confirmation; password-protected files prompt for verification
+- Reset all data with backup download prompt
 
 ## Tech stack
 
