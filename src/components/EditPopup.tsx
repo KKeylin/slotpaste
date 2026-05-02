@@ -46,14 +46,20 @@ export default function EditPopup({
 }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [localText, setLocalText] = useState(block.text)
+  const blockTextRef = useRef(block.text)
+  blockTextRef.current = block.text
 
   function hasChanges() {
     if (!savedBlock) return false
-    return JSON.stringify(savedBlock) !== JSON.stringify(block)
+    return localText !== savedBlock.text ||
+      block.fontSize !== savedBlock.fontSize ||
+      block.color !== savedBlock.color
   }
 
   function handleSave() {
     setConfirmOpen(false)
+    onChange({ ...block, text: localText })
     onSave()
   }
 
@@ -76,6 +82,7 @@ export default function EditPopup({
       setConfirmOpen(false)
       return
     }
+    setLocalText(blockTextRef.current)
     if (textareaRef.current) {
       const el = textareaRef.current
       el.style.height = 'auto'
@@ -109,7 +116,7 @@ export default function EditPopup({
 
   function applyColor(color: string) {
     const recent = appearance.recentColors.filter((c) => c !== color)
-    onColorChange({ ...block, color }, [color, ...recent].slice(0, 5))
+    onColorChange({ ...block, text: localText, color }, [color, ...recent].slice(0, 5))
   }
 
   const sizes: FontSize[] = ['h1', 'h2', 'md', 'sm']
@@ -174,9 +181,9 @@ export default function EditPopup({
             <div className="flex-1 overflow-auto px-4 pt-4 pb-2 min-h-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
               <textarea
                 ref={textareaRef}
-                value={block.text}
+                value={localText}
                 onChange={(e) => {
-                  onChange({ ...block, text: e.target.value })
+                  setLocalText(e.target.value)
                   e.target.style.height = 'auto'
                   e.target.style.height = e.target.scrollHeight + 'px'
                 }}
@@ -211,7 +218,7 @@ export default function EditPopup({
               {sizes.map((s) => (
                 <button
                   key={s}
-                  onClick={() => onChange({ ...block, fontSize: s })}
+                  onClick={() => onChange({ ...block, text: localText, fontSize: s })}
                   className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-medium transition-opacity"
                   style={{
                     backgroundColor: block.fontSize === s ? textColor : mutedColor,
@@ -231,7 +238,7 @@ export default function EditPopup({
                 accentColor={textColor}
                 wheelValue={block.color ?? appearance.blockColor}
                 onSelect={applyColor}
-                onWheelChange={(c) => onChange({ ...block, color: c })}
+                onWheelChange={(c) => onChange({ ...block, text: localText, color: c })}
                 onWheelBlur={applyColor}
               />
 
