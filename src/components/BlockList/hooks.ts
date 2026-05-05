@@ -20,23 +20,10 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
   panRef.current = pan
   scaleRef.current = scale
 
-  const GRID_SIZE = 100
-
-  function applyGridTransform(p: { x: number; y: number }, s: number) {
-    const el = containerRef.current
-    if (!el) return
-    const spacing = GRID_SIZE * s
-    const ox = ((p.x % spacing) + spacing) % spacing
-    const oy = ((p.y % spacing) + spacing) % spacing
-    el.style.backgroundSize = `${spacing}px ${spacing}px`
-    el.style.backgroundPosition = `${ox}px ${oy}px`
-  }
-
   function applyTransform(p: { x: number; y: number }, s: number) {
     if (canvasRef.current) {
       canvasRef.current.style.transform = `translate(${p.x}px, ${p.y}px) scale(${s})`
     }
-    applyGridTransform(p, s)
   }
 
   function animateTo(transform: string, duration = '0.45s') {
@@ -56,7 +43,6 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     }
     panRef.current = newPan
     animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(${scaleRef.current})`)
-    applyGridTransform(newPan, scaleRef.current)
     setPan({ ...newPan })
   }
 
@@ -188,7 +174,6 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     panRef.current = newPan
     scaleRef.current = 1
     animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(1)`)
-    applyGridTransform(newPan, 1)
     setPan({ ...newPan })
     setScale(1)
   }
@@ -205,7 +190,6 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     panRef.current = newPan
     scaleRef.current = 1
     animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(1)`, '0.3s')
-    applyGridTransform(newPan, 1)
     setPan({ ...newPan })
     setScale(1)
   }
