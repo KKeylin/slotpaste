@@ -18,12 +18,16 @@ export interface Tab {
   viewMode: 'list' | 'canvas'
 }
 
+export type GridMode = 'none' | 'dots' | 'lines'
+
 export interface Appearance {
   bgColor: string
   blockColor: string
   blockOpacity: number
   accentColor: string
   recentColors: string[]
+  gridMode?: GridMode
+  gridOpacity?: number
 }
 
 export interface KeyShortcut {

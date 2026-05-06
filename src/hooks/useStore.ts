@@ -12,6 +12,8 @@ const defaultState: AppState = {
     blockOpacity: 1,
     accentColor: '#333333',
     recentColors: [],
+    gridMode: 'dots',
+    gridOpacity: 0.12,
   },
 }
 

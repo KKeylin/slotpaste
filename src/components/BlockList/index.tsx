@@ -19,6 +19,17 @@ interface Props {
   collisionPrevention?: boolean
 }
 
+const CANVAS_GRID_SIZE = 32
+
+function gridBackground(appearance: Props['appearance'], isDark: boolean): string | undefined {
+  const mode = appearance.gridMode ?? 'dots'
+  if (mode === 'none') return undefined
+  const opacity = appearance.gridOpacity ?? 0.12
+  const color = isDark ? `rgba(255,255,255,${opacity})` : `rgba(0,0,0,${opacity})`
+  if (mode === 'dots') return `radial-gradient(circle, ${color} 1px, transparent 1px)`
+  return `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`
+}
+
 export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly, collisionPrevention }: Props) {
   const isDark = isColorDark(appearance.bgColor)
   const sensors = useSensors(
@@ -33,7 +44,12 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div ref={containerRef} className="relative flex-1 overflow-hidden" style={{ touchAction: 'none' }} {...touchHandlers}>
+      <div
+        ref={containerRef}
+        className="relative flex-1 overflow-hidden"
+        style={{ touchAction: 'none', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)' }}
+        {...touchHandlers}
+      >
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <div
             ref={canvasRef}
@@ -44,6 +60,9 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
               transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
               transformOrigin: '0 0',
               willChange: 'transform',
+              backgroundColor: appearance.bgColor,
+              backgroundImage: gridBackground(appearance, isDark),
+              backgroundSize: `${CANVAS_GRID_SIZE}px ${CANVAS_GRID_SIZE}px`,
             }}
             {...pointerHandlers}
           >

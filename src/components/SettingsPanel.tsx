@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import colorWheelImg from '../assets/color-wheel-2.png'
-import type { Appearance, KeyShortcut } from '../types'
+import type { Appearance, GridMode, KeyShortcut } from '../types'
 import { VERSION } from '../constants'
 import { formatShortcut, type ShortcutMap, DEFAULT_SHORTCUTS } from '../hooks/useKeyboardShortcuts'
 
@@ -307,6 +307,54 @@ export default function SettingsPanel({ isOpen, appearance, secureEnabled, secur
               <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Collision prevention</span>
               <Toggle checked={collisionPrevention} onChange={onCollisionPreventionChange} />
             </div>
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+
+          <div className="flex flex-col gap-3">
+            <span className="text-[10px] font-medium tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              Grid
+            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Style</span>
+              <div className="flex items-center gap-1">
+                {(['none', 'dots', 'lines'] as GridMode[]).map((mode) => {
+                  const active = (appearance.gridMode ?? 'dots') === mode
+                  return (
+                    <button
+                      key={mode}
+                      onClick={() => onChange({ ...appearance, gridMode: mode })}
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-medium transition-opacity hover:opacity-80"
+                      style={{
+                        backgroundColor: active ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)',
+                        color: active ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)',
+                      }}
+                    >
+                      {mode === 'none' ? 'Off' : mode.charAt(0).toUpperCase() + mode.slice(1)}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+            {(appearance.gridMode ?? 'dots') !== 'none' && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs flex-shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }}>Opacity</span>
+                <input
+                  type="range"
+                  min={1}
+                  max={100}
+                  value={Math.round((appearance.gridOpacity ?? 0.12) * 100)}
+                  onChange={(e) => onChange({ ...appearance, gridOpacity: Number(e.target.value) / 100 })}
+                  className="flex-1 h-1 rounded-full appearance-none cursor-pointer accent-white"
+                  style={{
+                    background: `linear-gradient(to right, rgba(255,255,255,0.7) ${Math.round((appearance.gridOpacity ?? 0.12) * 100)}%, rgba(255,255,255,0.15) ${Math.round((appearance.gridOpacity ?? 0.12) * 100)}%)`,
+                  }}
+                />
+                <span className="text-[11px] w-8 text-right tabular-nums" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  {Math.round((appearance.gridOpacity ?? 0.12) * 100)}%
+                </span>
+              </div>
+            )}
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
