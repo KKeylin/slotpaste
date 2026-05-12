@@ -3,7 +3,7 @@ import type { Block as BlockType, Appearance } from '../../types'
 import DraggableBlock from '../DraggableBlock'
 import AddBlock from '../AddBlock'
 import { useCanvas, useBlockSnap } from './hooks'
-import { CANVAS_SIZE } from '../../constants'
+import { CANVAS_W, CANVAS_H } from '../../constants'
 import { isColorDark } from '../../utils/color'
 
 interface Props {
@@ -55,8 +55,8 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
             ref={canvasRef}
             style={{
               position: 'absolute',
-              width: CANVAS_SIZE,
-              height: CANVAS_SIZE,
+              width: CANVAS_W,
+              height: CANVAS_H,
               transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
               transformOrigin: '0 0',
               willChange: 'transform',
@@ -70,7 +70,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
               <DraggableBlock
                 key={block.id}
                 block={block}
-                position={block.position ?? { x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 + i * 90 }}
+                position={block.position ?? { x: CANVAS_W / 2, y: CANVAS_H / 2 + i * 90 }}
                 scale={scale}
                 snapping={snappingIds.has(block.id)}
                 appearance={appearance}
@@ -88,8 +88,8 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
               <p
                 className="absolute text-xs select-none pointer-events-none"
                 style={{
-                  left: CANVAS_SIZE / 2 - 50,
-                  top: CANVAS_SIZE / 2 - 8,
+                  left: CANVAS_W / 2 - 50,
+                  top: CANVAS_H / 2 - 8,
                   color: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.2)',
                 }}
               >

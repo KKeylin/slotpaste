@@ -1,4 +1,5 @@
-export const CANVAS_SIZE = 4000
+export const CANVAS_W = 6400
+export const CANVAS_H = 3968
 export const LONG_PRESS_MS = 1500
 export const MAX_PREVIEW = 32
 export const VERSION = '0.1.0'

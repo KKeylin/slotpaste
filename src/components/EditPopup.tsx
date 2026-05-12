@@ -125,7 +125,7 @@ export default function EditPopup({
     ? (() => {
         const vh = window.innerHeight
         const cx = blockRect.left + blockRect.width / 2
-        const popupH = Math.round(vh * 0.3)
+        const popupH = Math.round(vh * 0.3 / 32) * 32
 
         const spaceBelow = vh - blockRect.bottom - 8
         const spaceAbove = blockRect.top - 8
@@ -305,7 +305,7 @@ export default function EditPopup({
                   </div>
                 </motion.div>
               </motion.div>
-            )}
+            )}  ТаJnkbxyj
           </AnimatePresence>
         </>
       )}
