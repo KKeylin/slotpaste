@@ -26,7 +26,7 @@ function gridBackground(appearance: Props['appearance'], isDark: boolean): strin
   if (mode === 'none') return undefined
   const opacity = appearance.gridOpacity ?? 0.12
   const color = isDark ? `rgba(255,255,255,${opacity})` : `rgba(0,0,0,${opacity})`
-  if (mode === 'dots') return `radial-gradient(circle, ${color} 1px, transparent 1px)`
+  if (mode === 'dots') return `radial-gradient(circle at 0 0, ${color} 1px, transparent 1px)`
   return `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`
 }
 
