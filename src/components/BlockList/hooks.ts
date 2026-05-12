@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import { DragEndEvent } from '@dnd-kit/core'
 import type { Block as BlockType } from '../../types'
 import { findFreePosition } from '../../utils/collision'
-import { CANVAS_SIZE, BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from '../../constants'
+import { CANVAS_W, CANVAS_H, BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from '../../constants'
 
 export function useCanvas(blocks: BlockType[], activeTabId: string) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -49,7 +49,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
   useEffect(() => {
     if (!containerRef.current) return
     const { width, height } = containerRef.current.getBoundingClientRect()
-    const initial = { x: width / 2 - CANVAS_SIZE / 2, y: height / 2 - CANVAS_SIZE / 2 }
+    const initial = { x: width / 2 - CANVAS_W / 2, y: height / 2 - CANVAS_H / 2 }
     panRef.current = initial
     setPan(initial)
     applyTransform(initial, 1)
@@ -83,7 +83,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     if (blocks.length > prevBlockCount.current) {
       const newBlock = blocks[blocks.length - 1]
       const i = blocks.length - 1
-      const pos = newBlock.position ?? { x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 + i * 90 }
+      const pos = newBlock.position ?? { x: CANVAS_W / 2, y: CANVAS_H / 2 + i * 90 }
       panToPoint(pos.x, pos.y)
     }
     prevBlockCount.current = blocks.length
@@ -92,7 +92,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
   const isFirstRender = useRef(true)
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
-    panToPoint(CANVAS_SIZE / 2, CANVAS_SIZE / 2)
+    panToPoint(CANVAS_W / 2, CANVAS_H / 2)
   }, [activeTabId])
 
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
@@ -170,7 +170,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
   function resetView() {
     if (!containerRef.current || !canvasRef.current) return
     const { width, height } = containerRef.current.getBoundingClientRect()
-    const newPan = { x: width / 2 - CANVAS_SIZE / 2, y: height / 2 - CANVAS_SIZE / 2 }
+    const newPan = { x: width / 2 - CANVAS_W / 2, y: height / 2 - CANVAS_H / 2 }
     panRef.current = newPan
     scaleRef.current = 1
     animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(1)`)
@@ -258,10 +258,10 @@ export function useBlockSnap(
     const i = blocks.findIndex((b) => b.id === active.id)
     const block = blocks[i]
     if (!block) return
-    const pos = block.position ?? { x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 + i * 90 }
+    const pos = block.position ?? { x: CANVAS_W / 2, y: CANVAS_H / 2 + i * 90 }
     const rawPos = {
-      x: Math.max(0, Math.min(CANVAS_SIZE, pos.x + delta.x / scaleRef.current)),
-      y: Math.max(0, Math.min(CANVAS_SIZE, pos.y + delta.y / scaleRef.current)),
+      x: Math.max(0, Math.min(CANVAS_W, pos.x + delta.x / scaleRef.current)),
+      y: Math.max(0, Math.min(CANVAS_H, pos.y + delta.y / scaleRef.current)),
     }
     onChange({ ...block, position: rawPos })
     if (!collisionPrevention) return
