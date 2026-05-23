@@ -11,13 +11,6 @@ export interface Block {
   groupId?: string
 }
 
-export interface Tab {
-  id: string
-  name: string
-  blocks: Block[]
-  viewMode: 'list' | 'canvas'
-}
-
 export type GridMode = 'none' | 'dots' | 'lines'
 
 export interface Appearance {
@@ -28,6 +21,16 @@ export interface Appearance {
   recentColors: string[]
   gridMode?: GridMode
   gridOpacity?: number
+}
+
+export type TabAppearance = Partial<Omit<Appearance, 'recentColors'>>
+
+export interface Tab {
+  id: string
+  name: string
+  blocks: Block[]
+  viewMode: 'list' | 'canvas'
+  appearance?: TabAppearance
 }
 
 export interface KeyShortcut {

@@ -47,7 +47,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
       <div
         ref={containerRef}
         className="relative flex-1 overflow-hidden"
-        style={{ touchAction: 'none', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)' }}
+        style={{ touchAction: 'none' }}
         {...touchHandlers}
       >
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
