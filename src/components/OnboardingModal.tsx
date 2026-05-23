@@ -12,11 +12,11 @@ const SLIDES: SlideData[] = [
   {
     icon: (
       <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 16H5V5h2v3h10V5h2v14z"/>
+        <path d="M13 3a9 9 0 1 0 0 18A9 9 0 0 0 13 3zm-1 13v-2H8l4-8v4h4l-4 8z"/>
       </svg>
     ),
-    title: 'Welcome to SlotPaste',
-    body: 'Your personal snippet storage — keep any text you reuse in one place and paste it instantly. Fast, organized, and secure.',
+    title: 'Stop retyping the same text',
+    body: 'SlotPaste keeps the phrases, templates, and snippets you use every day — one tap away from your clipboard.',
   },
   {
     icon: (
@@ -24,8 +24,8 @@ const SLIDES: SlideData[] = [
         <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
       </svg>
     ),
-    title: 'Copy in one tap',
-    body: 'Tap any block to instantly copy its text to clipboard. Long press to enter edit mode — then tap × to delete or EDIT to update.',
+    title: 'Tap to copy, instantly',
+    body: 'Click any block to copy it to clipboard. Long-press to enter edit mode — update text, resize, or delete.',
   },
   {
     icon: (
@@ -33,8 +33,8 @@ const SLIDES: SlideData[] = [
         <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM5 10h2v2H5zm0 4h2v2H5zm4-4h10v2H9zm0 4h7v2H9z"/>
       </svg>
     ),
-    title: 'Organize with tabs',
-    body: 'Create tabs for different roles, companies, or content types. Long press a tab to delete it, double-tap its name to rename.',
+    title: 'One tab per context',
+    body: 'Work, personal, code — separate tabs for separate contexts. Use search to find any block across all tabs instantly.',
   },
   {
     icon: (
@@ -42,8 +42,8 @@ const SLIDES: SlideData[] = [
         <path d="M3 3h8v8H3zm0 10h8v8H3zm10-10h8v8h-8zm0 10h8v8h-8z"/>
       </svg>
     ),
-    title: 'List & Canvas',
-    body: 'List mode for quick scrolling. Canvas mode for free-form layout — drag blocks anywhere and zoom with scroll wheel.',
+    title: 'Canvas mode & works offline',
+    body: 'Switch to Canvas to arrange blocks freely — drag, zoom, pin visually. Install as an app for quick access from your dock.',
   },
 ]
 
