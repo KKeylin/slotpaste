@@ -7,6 +7,9 @@ import { useSecureMode } from './hooks/useSecureMode'
 import { useSecureOperations } from './hooks/useSecureOperations'
 import { useKeyboardShortcuts, DEFAULT_SHORTCUTS, type ShortcutMap } from './hooks/useKeyboardShortcuts'
 import TabBar from './components/TabBar'
+
+import CanvasHeader from './components/CanvasHeader'
+import CanvasSettingsPanel from './components/CanvasSettingsPanel'
 import BlockList from './components/BlockList'
 import ListView from './components/ListView'
 import Toast from './components/Toast'
@@ -18,10 +21,11 @@ import ResetModal from './components/ResetModal'
 import SearchBar from './components/SearchBar'
 import type { SearchBlock } from './components/SearchModal'
 import { LockIcon, HelpIcon, SettingsIcon } from './components/icons'
-import type { AppState, Block, Tab } from './types'
+import type { AppState, Block, Tab, TabAppearance } from './types'
 import { nanoid } from './utils/nanoid'
 import { findFreePosition } from './utils/collision'
-import { isColorDark } from './utils/color'
+import { isColorDark, hexToRgba } from './utils/color'
+import { resolveAppearance } from './utils/appearance'
 import { BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from './constants'
 import { SECURE_INTENT } from './enums'
 
@@ -30,6 +34,7 @@ export default function App() {
   const { toast, showToast } = useToast()
   const copy = useClipboard((text) => showToast(text))
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [canvasSettingsOpen, setCanvasSettingsOpen] = useState(false)
   const [resetOpen, setResetOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(() => !localStorage.getItem('slotpaste_onboarded'))
 
@@ -83,6 +88,7 @@ export default function App() {
   }
 
   const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
+  const tabAppearance = resolveAppearance(state.appearance, activeTab)
   const isSecureEnabled = !!state.secure?.enabled
   const collisionPrevention = state.preferences?.collisionPrevention ?? false
 
@@ -157,6 +163,14 @@ export default function App() {
 
   function reorderBlocks(blocks: Block[]) { patchTab(activeTab.id, { blocks }) }
 
+  function changeTabAppearance(patch: TabAppearance) {
+    patchTab(activeTab.id, { appearance: { ...activeTab.appearance, ...patch } })
+  }
+
+  function resetTabAppearance() {
+    patchTab(activeTab.id, { appearance: undefined })
+  }
+
   async function changeBlock(updated: Block) {
     const stored = await maybeEncrypt(updated)
     patchTab(activeTab.id, { blocks: activeTab.blocks.map((b) => (b.id === stored.id ? stored : b)) })
@@ -196,21 +210,18 @@ export default function App() {
   }
 
   const btnBase = {
-    backgroundColor: isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.82)',
-    color: isColorDark(state.appearance.bgColor) ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)',
+    backgroundColor: isColorDark(tabAppearance.bgColor) ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.82)',
+    color: isColorDark(tabAppearance.bgColor) ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)',
   }
 
-  return (
-    <div
-      className="flex flex-col h-dvh w-screen overflow-hidden"
-      style={{ backgroundColor: state.appearance.bgColor }}
-    >
+  const headerJSX = (
+    <>
       <div className="relative">
         <TabBar
           tabs={state.tabs}
           activeTabId={state.activeTabId}
-          accentColor={state.appearance.accentColor}
-          bgColor={state.appearance.bgColor}
+          accentColor={tabAppearance.accentColor}
+          bgColor={tabAppearance.bgColor}
           onSelect={(id) => patchState({ activeTabId: id })}
           onAdd={addTab}
           onRename={renameTab}
@@ -250,6 +261,73 @@ export default function App() {
           </button>
         </div>
       </div>
+      <CanvasHeader
+        tab={activeTab}
+        appearance={tabAppearance}
+        onRename={(name) => renameTab(activeTab.id, name)}
+        onOpenSettings={() => setCanvasSettingsOpen(true)}
+        onViewModeChange={(mode) => patchTab(activeTab.id, { viewMode: mode })}
+      />
+    </>
+  )
+
+  return (
+    <div
+      className="relative h-dvh w-screen overflow-hidden"
+      style={{ backgroundColor: tabAppearance.bgColor }}
+    >
+      {activeTab.viewMode === 'canvas' ? (
+        <div className="absolute inset-0 flex flex-col">
+          <BlockList
+            blocks={displayBlocks}
+            activeTabId={activeTab.id}
+            appearance={tabAppearance}
+            onCopy={copy}
+            onAdd={addBlock}
+            onChange={changeBlock}
+            onDelete={deleteBlock}
+            onColorChange={changeBlockAndColors}
+            readOnly={isSecureEnabled && secureMode.isLocked}
+            collisionPrevention={collisionPrevention}
+          />
+          <div className="absolute top-0 inset-x-0 z-10 pointer-events-none">
+            <div
+              className="pointer-events-auto"
+              style={{
+                backgroundColor: hexToRgba(tabAppearance.bgColor, 0.25),
+                backdropFilter: 'blur(2px)',
+                WebkitBackdropFilter: 'blur(2px)',
+              }}
+            >
+              {headerJSX}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex flex-col">
+          {headerJSX}
+          <ListView
+            blocks={displayBlocks}
+            appearance={tabAppearance}
+            onCopy={copy}
+            onAdd={addBlock}
+            onChange={changeBlock}
+            onDelete={deleteBlock}
+            onColorChange={changeBlockAndColors}
+            onReorder={reorderBlocks}
+            readOnly={isSecureEnabled && secureMode.isLocked}
+          />
+        </div>
+      )}
+
+      <CanvasSettingsPanel
+        isOpen={canvasSettingsOpen}
+        tab={activeTab}
+        tabAppearance={tabAppearance}
+        onTabAppearanceChange={changeTabAppearance}
+        onReset={resetTabAppearance}
+        onClose={() => setCanvasSettingsOpen(false)}
+      />
 
       <SettingsPanel
         isOpen={settingsOpen}
@@ -269,55 +347,6 @@ export default function App() {
         collisionPrevention={collisionPrevention}
         onCollisionPreventionChange={(v) => patchState({ preferences: { ...state.preferences, collisionPrevention: v } })}
       />
-
-      <div className="relative flex-1 flex flex-col overflow-hidden">
-        <div className="absolute top-2 right-2 z-10 flex flex-col rounded-xl overflow-hidden" style={{ border: `1px solid ${state.appearance.accentColor}` }}>
-          {(['canvas', 'list'] as const).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => patchTab(activeTab.id, { viewMode: mode })}
-              className="px-4 py-3 text-[10px] font-medium tracking-wide transition-colors"
-              style={{
-                backgroundColor: activeTab.viewMode === mode
-                  ? (isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)')
-                  : (isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'),
-                color: activeTab.viewMode === mode
-                  ? (isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.75)')
-                  : (isColorDark(state.appearance.bgColor) ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.3)'),
-              }}
-            >
-              {mode === 'canvas' ? 'Canvas' : 'List'}
-            </button>
-          ))}
-        </div>
-
-        {activeTab.viewMode === 'canvas' ? (
-          <BlockList
-            blocks={displayBlocks}
-            activeTabId={activeTab.id}
-            appearance={state.appearance}
-            onCopy={copy}
-            onAdd={addBlock}
-            onChange={changeBlock}
-            onDelete={deleteBlock}
-            onColorChange={changeBlockAndColors}
-            readOnly={isSecureEnabled && secureMode.isLocked}
-            collisionPrevention={collisionPrevention}
-          />
-        ) : (
-          <ListView
-            blocks={displayBlocks}
-            appearance={state.appearance}
-            onCopy={copy}
-            onAdd={addBlock}
-            onChange={changeBlock}
-            onDelete={deleteBlock}
-            onColorChange={changeBlockAndColors}
-            onReorder={reorderBlocks}
-            readOnly={isSecureEnabled && secureMode.isLocked}
-          />
-        )}
-      </div>
 
       <Toast toast={toast} />
 
@@ -345,7 +374,6 @@ export default function App() {
           />
         )}
       </AnimatePresence>
-
 
       <AnimatePresence>
         {secureOps.intent && (

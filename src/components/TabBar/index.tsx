@@ -104,7 +104,7 @@ function SortableTab({
             backgroundColor: active ? (isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)') : 'transparent',
             color: active ? (isDark ? 'rgba(255,255,255,0.87)' : 'rgba(0,0,0,0.87)') : (isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.4)'),
             border: '1px solid',
-            borderColor: active ? accentColor : 'transparent',
+            borderColor: active ? (tab.appearance?.bgColor ?? accentColor) : 'transparent',
           }}
         >
           {isEditing ? (
@@ -121,7 +121,20 @@ function SortableTab({
               style={{ color: isDark ? 'rgba(255,255,255,0.87)' : 'rgba(0,0,0,0.87)' }}
             />
           ) : (
-            tab.name
+            <span className="flex items-center gap-1.5">
+              {tab.appearance?.bgColor && (
+                <span
+                  className="inline-block rounded-full shrink-0"
+                  style={{
+                    width: 6,
+                    height: 6,
+                    backgroundColor: tab.appearance.bgColor,
+                    boxShadow: '0 0 0 1px rgba(255,255,255,0.15)',
+                  }}
+                />
+              )}
+              {tab.name}
+            </span>
           )}
         </div>
       </motion.div>
