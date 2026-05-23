@@ -329,7 +329,7 @@ export default function App() {
               <div className="pointer-events-auto rounded-xl" style={{ ...blurStyle, paddingLeft: 8, paddingRight: 42 }}>
                 {canvasHeaderEl}
               </div>
-              <div className="pointer-events-auto">
+              <div className="pointer-events-auto" style={{ ...blurStyle, padding: 8, borderRadius: 10 }}>
                 {viewToggleJSX}
               </div>
             </div>
