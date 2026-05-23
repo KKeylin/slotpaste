@@ -77,8 +77,8 @@ export default function Block({ block, appearance, scale = 1, onCopy, onChange, 
               className={`${fontSizeClasses[block.fontSize]} leading-snug pr-6`}
               style={
                 block.height
-                  ? { whiteSpace: 'pre-wrap', display: '-webkit-box', WebkitLineClamp: 99, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
-                  : { whiteSpace: 'pre-wrap' }
+                  ? { whiteSpace: 'pre-wrap', overflowWrap: 'break-word', display: '-webkit-box', WebkitLineClamp: 99, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
+                  : { whiteSpace: 'pre-wrap', overflowWrap: 'break-word' }
               }
             >
               {block.text}

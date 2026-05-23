@@ -49,7 +49,8 @@ export default function CanvasHeader({ tab, appearance, onRename, onOpenSettings
     if (e.key === 'Escape') setEditing(false)
   }
 
-  const nameWidth = Math.max(textWidth, 40)
+  const MAX_NAME_W = 260
+  const nameWidth = Math.min(Math.max(textWidth, 40), MAX_NAME_W)
 
   return (
     <div className="relative inline-flex items-center" style={{ height: 44 }}>
@@ -78,7 +79,7 @@ export default function CanvasHeader({ tab, appearance, onRename, onOpenSettings
         <button
           onClick={() => setEditing(true)}
           className="font-semibold transition-opacity hover:opacity-70 select-none"
-          style={{ fontSize: 32, color: textColor, textShadow: nameShadow }}
+          style={{ fontSize: 32, color: textColor, textShadow: nameShadow, maxWidth: MAX_NAME_W, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
           {tab.name}
         </button>

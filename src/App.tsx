@@ -220,7 +220,7 @@ export default function App() {
               {headerEl}
             </div>
             <div className="flex items-center justify-between px-3 py-2">
-              <div className="pointer-events-auto rounded-xl" style={{ ...blurStyle, paddingLeft: 8, paddingRight: 42 }}>
+              <div className="pointer-events-auto rounded-xl" style={{ ...blurStyle, paddingLeft: 8, paddingRight: 42, maxWidth: 'min(380px, 65vw)' }}>
                 {canvasHeaderEl}
               </div>
               <div className="pointer-events-auto" style={{ ...blurStyle, padding: 8, borderRadius: 10 }}>
