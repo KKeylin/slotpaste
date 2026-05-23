@@ -16,13 +16,14 @@ export default function Toast({ toast }: Props) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.15 }}
-          className="fixed top-4 right-4 px-3 py-2 rounded-xl text-xs"
+          className="fixed top-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded-xl text-xs whitespace-nowrap"
           style={{
             backgroundColor: '#1D9E75',
             color: 'rgba(255,255,255,0.95)',
+            zIndex: 9999,
           }}
         >
-          «{toast.text.slice(0, MAX_PREVIEW)}{toast.text.length > MAX_PREVIEW ? '…' : ''}» скопирован
+          "{toast.text.slice(0, MAX_PREVIEW)}{toast.text.length > MAX_PREVIEW ? '…' : ''}" copied
         </motion.div>
       )}
     </AnimatePresence>
