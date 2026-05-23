@@ -40,6 +40,7 @@ export default function CanvasHeader({ tab, appearance, onRename, onOpenSettings
   function commit() {
     const trimmed = value.trim()
     if (trimmed) onRename(trimmed)
+    else setValue(tab.name)
     setEditing(false)
   }
 
