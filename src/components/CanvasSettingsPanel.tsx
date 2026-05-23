@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import colorWheelImg from '../assets/color-wheel-2.png'
 import type { Appearance, GridMode, Tab, TabAppearance } from '../types'
+import { isColorDark } from '../utils/color'
 
 function hexToRgb(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16)
@@ -29,7 +30,7 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
           <button
             onClick={() => setFmt(f => f === 'hex' ? 'rgb' : 'hex')}
             className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition-opacity hover:opacity-80"
-            style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid transparent' }}
+            style={{ backgroundColor: color, color: isColorDark(color) ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.75)' }}
           >
             {fmt === 'hex' ? color : hexToRgb(color)}
           </button>

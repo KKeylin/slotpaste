@@ -4,7 +4,7 @@ import DraggableBlock from '../DraggableBlock'
 import AddBlock from '../AddBlock'
 import { useCanvas, useBlockSnap } from './hooks'
 import { CANVAS_W, CANVAS_H } from '../../constants'
-import { isColorDark } from '../../utils/color'
+import { isColorDark, hexToRgba } from '../../utils/color'
 
 interface Props {
   blocks: BlockType[]
@@ -119,7 +119,12 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
           </button>
         </div>
       </div>
-      <AddBlock appearance={appearance} onAdd={onAdd} readOnly={readOnly} />
+      <div
+        className="absolute bottom-0 inset-x-0"
+        style={{ backgroundColor: hexToRgba(appearance.bgColor, 0.75), backdropFilter: 'blur(2px)', WebkitBackdropFilter: 'blur(2px)' }}
+      >
+        <AddBlock appearance={appearance} onAdd={onAdd} readOnly={readOnly} />
+      </div>
     </div>
   )
 }
