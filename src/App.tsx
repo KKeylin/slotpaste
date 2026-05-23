@@ -214,61 +214,90 @@ export default function App() {
     color: isColorDark(tabAppearance.bgColor) ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)',
   }
 
-  const headerJSX = (
-    <>
-      <div className="relative">
-        <TabBar
-          tabs={state.tabs}
-          activeTabId={state.activeTabId}
-          accentColor={tabAppearance.accentColor}
-          bgColor={tabAppearance.bgColor}
-          onSelect={(id) => patchState({ activeTabId: id })}
-          onAdd={addTab}
-          onRename={renameTab}
-          onReorder={reorderTabs}
-          onDelete={deleteTab}
-        />
-        <div className="absolute top-0 right-0 flex items-center">
-          <SearchBar blocks={searchBlocks} onCopy={copy} buttonStyle={btnBase} shortcut={shortcuts.search} />
-          {isSecureEnabled && (
-            <button
-              onClick={() => secureMode.isLocked ? secureOps.open(SECURE_INTENT.UNLOCK) : secureMode.lock()}
-              className="w-10 h-10 flex items-center justify-center mr-2 hover:opacity-80"
-              style={{
-                backgroundColor: secureMode.isLocked ? '#E24B4A' : '#1D9E75',
-                color: 'white',
-                borderBottomLeftRadius: '12px',
-                borderBottomRightRadius: '12px',
-                transition: 'background-color 0.3s ease',
-              }}
-            >
-              <LockIcon />
-            </button>
-          )}
-          <button
-            onClick={() => setHelpOpen(true)}
-            className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
-            style={{ ...btnBase, borderBottomLeftRadius: '12px', opacity: helpOpen ? 1 : 0.7 }}
-          >
-            <HelpIcon />
-          </button>
-          <button
-            onClick={() => setSettingsOpen((v) => !v)}
-            className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
-            style={{ ...btnBase, opacity: settingsOpen ? 1 : 0.7 }}
-          >
-            <SettingsIcon />
-          </button>
-        </div>
-      </div>
-      <CanvasHeader
-        tab={activeTab}
-        appearance={tabAppearance}
-        onRename={(name) => renameTab(activeTab.id, name)}
-        onOpenSettings={() => setCanvasSettingsOpen(true)}
-        onViewModeChange={(mode) => patchTab(activeTab.id, { viewMode: mode })}
+  const dark = isColorDark(tabAppearance.bgColor)
+  const blurStyle = {
+    backgroundColor: hexToRgba(tabAppearance.bgColor, 0.75),
+    backdropFilter: 'blur(2px)',
+    WebkitBackdropFilter: 'blur(2px)',
+  }
+
+  const tabBarJSX = (
+    <div className="relative">
+      <TabBar
+        tabs={state.tabs}
+        activeTabId={state.activeTabId}
+        accentColor={tabAppearance.accentColor}
+        bgColor={tabAppearance.bgColor}
+        onSelect={(id) => patchState({ activeTabId: id })}
+        onAdd={addTab}
+        onRename={renameTab}
+        onReorder={reorderTabs}
+        onDelete={deleteTab}
       />
-    </>
+      <div className="absolute top-0 right-0 flex items-center">
+        <SearchBar blocks={searchBlocks} onCopy={copy} buttonStyle={btnBase} shortcut={shortcuts.search} />
+        {isSecureEnabled && (
+          <button
+            onClick={() => secureMode.isLocked ? secureOps.open(SECURE_INTENT.UNLOCK) : secureMode.lock()}
+            className="w-10 h-10 flex items-center justify-center mr-2 hover:opacity-80"
+            style={{
+              backgroundColor: secureMode.isLocked ? '#E24B4A' : '#1D9E75',
+              color: 'white',
+              borderBottomLeftRadius: '12px',
+              borderBottomRightRadius: '12px',
+              transition: 'background-color 0.3s ease',
+            }}
+          >
+            <LockIcon />
+          </button>
+        )}
+        <button
+          onClick={() => setHelpOpen(true)}
+          className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
+          style={{ ...btnBase, borderBottomLeftRadius: '12px', opacity: helpOpen ? 1 : 0.7 }}
+        >
+          <HelpIcon />
+        </button>
+        <button
+          onClick={() => setSettingsOpen((v) => !v)}
+          className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-75"
+          style={{ ...btnBase, opacity: settingsOpen ? 1 : 0.7 }}
+        >
+          <SettingsIcon />
+        </button>
+      </div>
+    </div>
+  )
+
+  const viewToggleJSX = (
+    <div className="flex rounded-xl overflow-hidden" style={{ border: `1px solid ${tabAppearance.accentColor}` }}>
+      {(['canvas', 'list'] as const).map((mode) => (
+        <button
+          key={mode}
+          onClick={() => patchTab(activeTab.id, { viewMode: mode })}
+          className="px-3 py-1 text-[10px] font-medium tracking-wide transition-colors"
+          style={{
+            backgroundColor: activeTab.viewMode === mode
+              ? (dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)')
+              : (dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'),
+            color: activeTab.viewMode === mode
+              ? (dark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.75)')
+              : (dark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.3)'),
+          }}
+        >
+          {mode === 'canvas' ? 'Canvas' : 'List'}
+        </button>
+      ))}
+    </div>
+  )
+
+  const canvasHeaderEl = (
+    <CanvasHeader
+      tab={activeTab}
+      appearance={tabAppearance}
+      onRename={(name) => renameTab(activeTab.id, name)}
+      onOpenSettings={() => setCanvasSettingsOpen(true)}
+    />
   )
 
   return (
@@ -291,21 +320,28 @@ export default function App() {
             collisionPrevention={collisionPrevention}
           />
           <div className="absolute top-0 inset-x-0 z-10 pointer-events-none">
-            <div
-              className="pointer-events-auto"
-              style={{
-                backgroundColor: hexToRgba(tabAppearance.bgColor, 0.25),
-                backdropFilter: 'blur(2px)',
-                WebkitBackdropFilter: 'blur(2px)',
-              }}
-            >
-              {headerJSX}
+            {/* TabBar: full-width blur */}
+            <div className="pointer-events-auto" style={blurStyle}>
+              {tabBarJSX}
+            </div>
+            {/* Title pill (left) + toggle (right), rest passthrough */}
+            <div className="flex items-center justify-between px-3 py-2">
+              <div className="pointer-events-auto rounded-xl" style={{ ...blurStyle, paddingLeft: 8, paddingRight: 42 }}>
+                {canvasHeaderEl}
+              </div>
+              <div className="pointer-events-auto" style={{ ...blurStyle, padding: 8, borderRadius: 10 }}>
+                {viewToggleJSX}
+              </div>
             </div>
           </div>
         </div>
       ) : (
         <div className="absolute inset-0 flex flex-col">
-          {headerJSX}
+          {tabBarJSX}
+          <div className="flex items-center justify-between px-3 py-2">
+            {canvasHeaderEl}
+            {viewToggleJSX}
+          </div>
           <ListView
             blocks={displayBlocks}
             appearance={tabAppearance}

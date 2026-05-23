@@ -50,7 +50,7 @@ export default function AddBlock({ appearance, onAdd, readOnly }: Props) {
           rows={2}
           className="flex-1 resize-none rounded-xl px-3 py-2 text-sm outline-none transition-colors duration-200 placeholder:opacity-30"
           style={{
-            backgroundColor: hasCustomColor ? activeColor : (isColorDark(appearance.bgColor) ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'),
+            backgroundColor: hasCustomColor ? activeColor : appearance.bgColor,
             color: inputTextColor,
             border: `1px solid ${appearance.accentColor}`,
           }}
