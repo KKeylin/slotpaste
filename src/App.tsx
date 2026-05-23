@@ -253,6 +253,7 @@ export default function App() {
       <CanvasSettingsPanel
         isOpen={canvasSettingsOpen}
         tab={activeTab}
+        tabCount={state.tabs.length}
         tabAppearance={tabAppearance}
         onTabAppearanceChange={changeTabAppearance}
         onReset={resetTabAppearance}

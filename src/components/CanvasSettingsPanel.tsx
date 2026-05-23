@@ -70,6 +70,7 @@ function ColorRow({ label, color, opacity, onColorChange, onOpacityChange }: Col
 interface Props {
   isOpen: boolean
   tab: Tab
+  tabCount: number
   tabAppearance: Appearance
   onTabAppearanceChange: (patch: TabAppearance) => void
   onReset: () => void
@@ -77,7 +78,7 @@ interface Props {
   onDelete: () => void
 }
 
-export default function CanvasSettingsPanel({ isOpen, tab, tabAppearance, onTabAppearanceChange, onReset, onClose, onDelete }: Props) {
+export default function CanvasSettingsPanel({ isOpen, tab, tabCount, tabAppearance, onTabAppearanceChange, onReset, onClose, onDelete }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -226,7 +227,11 @@ export default function CanvasSettingsPanel({ isOpen, tab, tabAppearance, onTabA
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
 
-          {!confirmDelete ? (
+          {tabCount === 1 ? (
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
+              Can't delete the only canvas.
+            </p>
+          ) : !confirmDelete ? (
             <button
               onClick={() => setConfirmDelete(true)}
               className="text-xs text-left transition-opacity hover:opacity-80"

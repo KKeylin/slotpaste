@@ -164,10 +164,10 @@ export default function Block({ block, appearance, scale = 1, onCopy, onChange, 
               >
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.87)' }}>
-                    Удалить блок?
+                    Delete block?
                   </p>
                   <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    «{block.text.length > 60 ? block.text.slice(0, 60) + '…' : block.text}»
+                    "{block.text.length > 60 ? block.text.slice(0, 60) + '…' : block.text}"
                   </p>
                 </div>
                 <div className="flex gap-2 justify-end">
@@ -176,14 +176,14 @@ export default function Block({ block, appearance, scale = 1, onCopy, onChange, 
                     className="px-4 py-1.5 rounded-xl text-xs transition-opacity hover:opacity-80"
                     style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}
                   >
-                    Отмена
+                    Cancel
                   </button>
                   <button
                     onClick={() => { setConfirmOpen(false); onDelete(block.id) }}
                     className="px-4 py-1.5 rounded-xl text-xs font-medium transition-opacity hover:opacity-80"
                     style={{ backgroundColor: '#E24B4A', color: 'white' }}
                   >
-                    Удалить
+                    Delete
                   </button>
                 </div>
               </motion.div>
