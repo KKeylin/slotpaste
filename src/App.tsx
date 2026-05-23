@@ -363,6 +363,7 @@ export default function App() {
         onTabAppearanceChange={changeTabAppearance}
         onReset={resetTabAppearance}
         onClose={() => setCanvasSettingsOpen(false)}
+        onDelete={() => { deleteTab(activeTab.id); setCanvasSettingsOpen(false) }}
       />
 
       <SettingsPanel

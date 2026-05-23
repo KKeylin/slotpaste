@@ -74,11 +74,13 @@ interface Props {
   onTabAppearanceChange: (patch: TabAppearance) => void
   onReset: () => void
   onClose: () => void
+  onDelete: () => void
 }
 
-export default function CanvasSettingsPanel({ isOpen, tab, tabAppearance, onTabAppearanceChange, onReset, onClose }: Props) {
+export default function CanvasSettingsPanel({ isOpen, tab, tabAppearance, onTabAppearanceChange, onReset, onClose, onDelete }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const hasOverrides = !!tab.appearance && Object.keys(tab.appearance).length > 0
   const gridMode = tabAppearance.gridMode ?? 'dots'
 
@@ -90,13 +92,23 @@ export default function CanvasSettingsPanel({ isOpen, tab, tabAppearance, onTabA
   }, [])
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) { setConfirmDelete(false); return }
     function handleOutside(e: PointerEvent) {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) onClose()
     }
     document.addEventListener('pointerdown', handleOutside)
     return () => document.removeEventListener('pointerdown', handleOutside)
   }, [isOpen])
+
+  function downloadTabBackup() {
+    const blob = new Blob([JSON.stringify(tab, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `slotpaste-canvas-${tab.name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return createPortal(
     <AnimatePresence>
@@ -211,6 +223,47 @@ export default function CanvasSettingsPanel({ isOpen, tab, tabAppearance, onTabA
           <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
             Overrides global defaults for this canvas.
           </p>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+
+          {!confirmDelete ? (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="text-xs text-left transition-opacity hover:opacity-80"
+              style={{ color: '#E24B4A' }}
+            >
+              Delete this canvas…
+            </button>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                All blocks will be permanently deleted. This cannot be undone.
+              </p>
+              <button
+                onClick={downloadTabBackup}
+                className="w-full py-1.5 rounded-xl text-xs font-medium transition-opacity hover:opacity-80"
+                style={{ backgroundColor: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.1)' }}
+              >
+                Download backup
+              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="flex-1 py-1.5 rounded-xl text-xs font-medium transition-opacity hover:opacity-80"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.08)' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="flex-1 py-1.5 rounded-xl text-xs font-medium transition-opacity hover:opacity-80"
+                  style={{ backgroundColor: 'rgba(226,75,74,0.15)', color: '#E24B4A', border: '1px solid rgba(226,75,74,0.3)' }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>,
