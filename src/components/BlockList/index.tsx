@@ -16,7 +16,9 @@ interface Props {
   onColorChange: (block: BlockType, recentColors: string[]) => void
   onDelete: (id: string) => void
   readOnly?: boolean
-  collisionPrevention?: boolean
+  homePoint?: { x: number; y: number; scale: number }
+  onSetHome: (point: { x: number; y: number; scale: number }) => void
+  onHomeSet?: () => void
 }
 
 const CANVAS_GRID_SIZE = 32
@@ -30,17 +32,17 @@ function gridBackground(appearance: Props['appearance'], isDark: boolean): strin
   return `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`
 }
 
-export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly, collisionPrevention }: Props) {
+export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly, homePoint, onSetHome, onHomeSet }: Props) {
   const isDark = isColorDark(appearance.bgColor)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
 
-  const { containerRef, canvasRef, pan, scale, scaleRef, resetView, resetZoom, pointerHandlers, touchHandlers } =
-    useCanvas(blocks, activeTabId)
+  const { containerRef, canvasRef, pan, scale, scaleRef, atHome, goHome, setHome, resetZoom, pointerHandlers, touchHandlers } =
+    useCanvas(blocks, activeTabId, homePoint, onSetHome)
 
-  const { snappingIds, handleSizeReport, handleResizeEnd, handleDragEnd } =
-    useBlockSnap(blocks, onChange, scaleRef, collisionPrevention)
+  const { handleDragEnd } =
+    useBlockSnap(blocks, onChange, scaleRef)
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
@@ -72,14 +74,11 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
                 block={block}
                 position={block.position ?? { x: CANVAS_W / 2, y: CANVAS_H / 2 + i * 90 }}
                 scale={scale}
-                snapping={snappingIds.has(block.id)}
                 appearance={appearance}
                 onCopy={onCopy}
                 onChange={onChange}
                 onColorChange={onColorChange}
                 onDelete={onDelete}
-                onResizeEnd={handleResizeEnd}
-                onSizeReport={handleSizeReport}
                 readOnly={readOnly}
               />
             ))}
@@ -99,31 +98,38 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
           </div>
         </DndContext>
 
-        <div
-          className="absolute right-3 flex flex-col gap-1.5"
-          style={{ bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}
-        >
-          <button
-            onClick={resetZoom}
-            className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80 tabular-nums"
-            style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)', border: `1px solid ${appearance.accentColor}` }}
-          >
-            {Math.round(scale * 100)}%
-          </button>
-          <button
-            onClick={resetView}
-            className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80"
-            style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)', border: `1px solid ${appearance.accentColor}` }}
-          >
-            ⌖ CENTER
-          </button>
-        </div>
       </div>
-      <div
-        className="absolute bottom-0 inset-x-0"
-        style={{ backgroundColor: hexToRgba(appearance.bgColor, 0.75), backdropFilter: 'blur(2px)', WebkitBackdropFilter: 'blur(2px)' }}
-      >
-        <AddBlock appearance={appearance} onAdd={onAdd} readOnly={readOnly} />
+      <div className="absolute bottom-0 inset-x-0">
+        <div className="relative">
+          <div className="absolute right-3 flex flex-col gap-1.5" style={{ bottom: 'calc(100% + 8px)' }}>
+            <button
+              onClick={resetZoom}
+              className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80 tabular-nums"
+              style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)', border: `1px solid ${appearance.accentColor}` }}
+            >
+              {Math.round(scale * 100)}%
+            </button>
+            <button
+              onClick={goHome}
+              disabled={atHome}
+              className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80 disabled:opacity-20 disabled:cursor-default"
+              style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)', border: `1px solid ${appearance.accentColor}` }}
+            >
+              ⌖ HOME
+            </button>
+            <button
+              onClick={() => { setHome(); onHomeSet?.() }}
+              disabled={atHome && !!homePoint}
+              className="px-2.5 py-1.5 rounded-xl text-[10px] font-medium tracking-wide transition-opacity opacity-40 hover:opacity-80 disabled:opacity-20 disabled:cursor-default"
+              style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)', border: `1px solid ${appearance.accentColor}` }}
+            >
+              ⊙ PIN
+            </button>
+          </div>
+          <div style={{ backgroundColor: hexToRgba(appearance.bgColor, 0.75), backdropFilter: 'blur(2px)', WebkitBackdropFilter: 'blur(2px)' }}>
+            <AddBlock appearance={appearance} onAdd={onAdd} readOnly={readOnly} />
+          </div>
+        </div>
       </div>
     </div>
   )

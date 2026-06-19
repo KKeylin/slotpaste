@@ -31,6 +31,7 @@ export interface Tab {
   blocks: Block[]
   viewMode: 'list' | 'canvas'
   appearance?: TabAppearance
+  home?: { x: number; y: number; scale: number }
 }
 
 export interface KeyShortcut {
@@ -53,7 +54,6 @@ export interface Preferences {
   prevTabShortcut?: KeyShortcut
   nextTabShortcut?: KeyShortcut
   lockShortcut?: KeyShortcut
-  collisionPrevention?: boolean
 }
 
 export interface AppState {

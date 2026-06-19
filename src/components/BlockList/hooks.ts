@@ -1,14 +1,19 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { DragEndEvent } from '@dnd-kit/core'
 import type { Block as BlockType } from '../../types'
-import { findFreePosition } from '../../utils/collision'
-import { CANVAS_W, CANVAS_H, BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from '../../constants'
+import { CANVAS_W, CANVAS_H } from '../../constants'
 
-export function useCanvas(blocks: BlockType[], activeTabId: string) {
+export function useCanvas(
+  blocks: BlockType[],
+  activeTabId: string,
+  home: { x: number; y: number; scale: number } | undefined,
+  onSetHome: (point: { x: number; y: number; scale: number }) => void,
+) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [scale, setScale] = useState(1)
+  const [atHome, setAtHome] = useState(false)
   const panRef = useRef({ x: 0, y: 0 })
   const scaleRef = useRef(1)
   const isPanning = useRef(false)
@@ -34,16 +39,21 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     el.addEventListener('transitionend', () => { el.style.transition = '' }, { once: true })
   }
 
-  function panToPoint(canvasX: number, canvasY: number) {
+  function panToPoint(canvasX: number, canvasY: number, targetScale?: number) {
     if (!containerRef.current || !canvasRef.current) return
     const { width, height } = containerRef.current.getBoundingClientRect()
+    const s = targetScale ?? scaleRef.current
     const newPan = {
-      x: width / 2 - canvasX * scaleRef.current,
-      y: height / 2 - canvasY * scaleRef.current,
+      x: width / 2 - canvasX * s,
+      y: height / 2 - canvasY * s,
     }
     panRef.current = newPan
-    animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(${scaleRef.current})`)
+    animateTo(`translate(${newPan.x}px, ${newPan.y}px) scale(${s})`)
     setPan({ ...newPan })
+    if (targetScale !== undefined) {
+      scaleRef.current = targetScale
+      setScale(targetScale)
+    }
   }
 
   useEffect(() => {
@@ -60,6 +70,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     if (!el) return
     function onWheel(e: WheelEvent) {
       e.preventDefault()
+      setAtHome(false)
       const factor = 1 - e.deltaY * 0.001
       const newScale = Math.min(3, Math.max(0.15, scaleRef.current * factor))
       const rect = el!.getBoundingClientRect()
@@ -92,11 +103,16 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
   const isFirstRender = useRef(true)
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
-    panToPoint(CANVAS_W / 2, CANVAS_H / 2)
+    if (home) {
+      panToPoint(home.x, home.y, home.scale)
+    } else {
+      resetView()
+    }
   }, [activeTabId])
 
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (e.target !== e.currentTarget) return
+    setAtHome(false)
     isPanning.current = true
     panStart.current = {
       mouseX: e.clientX,
@@ -126,6 +142,7 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
 
   function handleTouchStart(e: React.TouchEvent) {
     if (e.touches.length === 2) {
+      setAtHome(false)
       isPanning.current = false
       const t1 = e.touches[0], t2 = e.touches[1]
       pinchStartDist.current = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
@@ -167,6 +184,24 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     pinchStartDist.current = 0
   }
 
+  function goHome() {
+    if (home) {
+      panToPoint(home.x, home.y, home.scale)
+    } else {
+      resetView()
+    }
+    setAtHome(true)
+  }
+
+  function setHome() {
+    if (!containerRef.current) return
+    const { width, height } = containerRef.current.getBoundingClientRect()
+    const canvasX = (width / 2 - panRef.current.x) / scaleRef.current
+    const canvasY = (height / 2 - panRef.current.y) / scaleRef.current
+    onSetHome({ x: canvasX, y: canvasY, scale: scaleRef.current })
+    setAtHome(true)
+  }
+
   function resetView() {
     if (!containerRef.current || !canvasRef.current) return
     const { width, height } = containerRef.current.getBoundingClientRect()
@@ -200,6 +235,9 @@ export function useCanvas(blocks: BlockType[], activeTabId: string) {
     pan,
     scale,
     scaleRef,
+    atHome,
+    goHome,
+    setHome,
     resetView,
     resetZoom,
     pointerHandlers: {
@@ -219,40 +257,7 @@ export function useBlockSnap(
   blocks: BlockType[],
   onChange: (block: BlockType) => void,
   scaleRef: React.MutableRefObject<number>,
-  collisionPrevention = false,
 ) {
-  const measuredSizes = useRef<Map<string, { w: number; h: number }>>(new Map())
-  const [snappingIds, setSnappingIds] = useState<Set<string>>(new Set())
-
-  const triggerSnap = useCallback((id: string) => {
-    setSnappingIds(prev => new Set(prev).add(id))
-    setTimeout(() => setSnappingIds(prev => { const next = new Set(prev); next.delete(id); return next }), 500)
-  }, [])
-
-  const handleSizeReport = useCallback((id: string, w: number, h: number) => {
-    measuredSizes.current.set(id, { w, h })
-  }, [])
-
-  function effectiveSize(block: BlockType) {
-    const m = measuredSizes.current.get(block.id)
-    return {
-      w: m?.w ?? (block.width ?? BLOCK_DEFAULT_W),
-      h: m?.h ?? (block.height ?? BLOCK_DEFAULT_H) + EDIT_OVERHANG,
-    }
-  }
-
-  function handleResizeEnd(updated: BlockType) {
-    if (!updated.position || !collisionPrevention) return
-    requestAnimationFrame(() => {
-      const sz = effectiveSize(updated)
-      const freePos = findFreePosition(updated.position!, sz, blocks, updated.id, measuredSizes.current)
-      if (freePos.x !== updated.position!.x || freePos.y !== updated.position!.y) {
-        onChange({ ...updated, position: freePos })
-        triggerSnap(updated.id)
-      }
-    })
-  }
-
   function handleDragEnd(event: DragEndEvent) {
     const { active, delta } = event
     const i = blocks.findIndex((b) => b.id === active.id)
@@ -264,21 +269,7 @@ export function useBlockSnap(
       y: Math.max(0, Math.min(CANVAS_H, pos.y + delta.y / scaleRef.current)),
     }
     onChange({ ...block, position: rawPos })
-    if (!collisionPrevention) return
-    const sz = effectiveSize(block)
-    const freePos = findFreePosition(rawPos, sz, blocks, block.id, measuredSizes.current)
-    if (rawPos.x !== freePos.x || rawPos.y !== freePos.y) {
-      requestAnimationFrame(() => {
-        onChange({ ...block, position: freePos })
-        triggerSnap(block.id)
-      })
-    }
   }
 
-  return {
-    snappingIds,
-    handleSizeReport,
-    handleResizeEnd,
-    handleDragEnd,
-  }
+  return { handleDragEnd }
 }

@@ -41,7 +41,6 @@ export default function App() {
   const activeTab = state.tabs.find((t) => t.id === state.activeTabId) ?? state.tabs[0]
   const tabAppearance = resolveAppearance(state.appearance, activeTab)
   const isSecureEnabled = !!state.secure?.enabled
-  const collisionPrevention = state.preferences?.collisionPrevention ?? false
 
   const { patchState, patchTab, addTab, renameTab, deleteTab, reorderTabs } = useTabActions({ state, updateState })
   const { addBlock, reorderBlocks, changeBlock, deleteBlock, changeBlockAndColors } = useBlockActions({
@@ -50,7 +49,6 @@ export default function App() {
     activeTab,
     patchTab,
     isSecureEnabled,
-    collisionPrevention,
     secureHandle: {
       isLocked: secureMode.isLocked,
       encryptForStore: secureMode.encryptForStore,
@@ -213,7 +211,9 @@ export default function App() {
             onDelete={deleteBlock}
             onColorChange={changeBlockAndColors}
             readOnly={readOnly}
-            collisionPrevention={collisionPrevention}
+            homePoint={activeTab.home}
+            onSetHome={(point) => patchTab(activeTab.id, { home: point })}
+            onHomeSet={() => showToast('', 'Home point saved')}
           />
           <div className="absolute top-0 inset-x-0 z-10 pointer-events-none">
             <div className="pointer-events-auto" style={blurStyle}>
@@ -276,8 +276,6 @@ export default function App() {
         onReset={() => { setSettingsOpen(false); setResetOpen(true) }}
         shortcuts={shortcuts}
         onShortcutChange={handleShortcutChange}
-        collisionPrevention={collisionPrevention}
-        onCollisionPreventionChange={(v) => patchState({ preferences: { ...state.preferences, collisionPrevention: v } })}
       />
 
       <Toast toast={toast} />

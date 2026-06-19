@@ -1,7 +1,5 @@
 import type { AppState, Block, Tab } from '../types'
 import { nanoid } from '../utils/nanoid'
-import { findFreePosition } from '../utils/collision'
-import { BLOCK_DEFAULT_W, BLOCK_DEFAULT_H, EDIT_OVERHANG } from '../constants'
 
 interface SecureHandle {
   isLocked: boolean
@@ -15,11 +13,10 @@ interface Params {
   activeTab: Tab
   patchTab: (tabId: string, patch: Partial<Tab>) => void
   isSecureEnabled: boolean
-  collisionPrevention: boolean
   secureHandle: SecureHandle
 }
 
-export function useBlockActions({ state, updateState, activeTab, patchTab, isSecureEnabled, collisionPrevention, secureHandle }: Params) {
+export function useBlockActions({ state, updateState, activeTab, patchTab, isSecureEnabled, secureHandle }: Params) {
   async function maybeEncrypt(block: Block): Promise<Block> {
     if (!isSecureEnabled || secureHandle.isLocked) return block
     return { ...block, text: await secureHandle.encryptForStore(block.id, block.text) }
@@ -31,12 +28,9 @@ export function useBlockActions({ state, updateState, activeTab, patchTab, isSec
     if (activeTab.viewMode === 'canvas') {
       const last = activeTab.blocks[activeTab.blocks.length - 1]
       const i = activeTab.blocks.length
-      const desired = last
+      position = last
         ? { x: last.position?.x ?? 2000, y: (last.position?.y ?? 2000 + (i - 1) * 90) + (last.height ?? 90) + 20 }
         : { x: 2000, y: 2000 }
-      position = collisionPrevention
-        ? findFreePosition(desired, { w: BLOCK_DEFAULT_W, h: BLOCK_DEFAULT_H + EDIT_OVERHANG }, activeTab.blocks)
-        : desired
     }
     const draft: Block = { id, text, fontSize: 'md', ...(position ? { position } : {}), ...(color ? { color } : {}) }
     const block = await maybeEncrypt(draft)

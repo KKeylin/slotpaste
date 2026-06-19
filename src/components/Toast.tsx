@@ -23,7 +23,7 @@ export default function Toast({ toast }: Props) {
             zIndex: 9999,
           }}
         >
-          "{toast.text.slice(0, MAX_PREVIEW)}{toast.text.length > MAX_PREVIEW ? '…' : ''}" copied
+          {toast.message ?? `"${toast.text.slice(0, MAX_PREVIEW)}${toast.text.length > MAX_PREVIEW ? '…' : ''}" copied`}
         </motion.div>
       )}
     </AnimatePresence>
