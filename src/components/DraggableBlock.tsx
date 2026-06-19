@@ -8,18 +8,16 @@ interface Props {
   block: BlockType
   position: { x: number; y: number }
   scale?: number
-  snapping?: boolean
   appearance: Appearance
   onCopy: (text: string) => void
   onChange: (block: BlockType) => void
   onColorChange: (block: BlockType, recentColors: string[]) => void
   onDelete: (id: string) => void
   onResizeEnd?: (block: BlockType) => void
-  onSizeReport?: (id: string, w: number, h: number) => void
   readOnly?: boolean
 }
 
-export default function DraggableBlock({ block, position, scale = 1, snapping = false, onSizeReport, ...rest }: Props) {
+export default function DraggableBlock({ block, position, scale = 1, ...rest }: Props) {
   const [wiggling, setWiggling] = useState(false)
   const [showGlow, setShowGlow] = useState(true)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
@@ -39,18 +37,6 @@ export default function DraggableBlock({ block, position, scale = 1, snapping = 
     wrapperRef.current = el
   }, [setNodeRef])
 
-  useEffect(() => {
-    const el = wrapperRef.current
-    if (!el || !onSizeReport) return
-    const ro = new ResizeObserver(() => {
-      if (wrapperRef.current) {
-        onSizeReport(block.id, wrapperRef.current.offsetWidth, wrapperRef.current.offsetHeight)
-      }
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [block.id, onSizeReport])
-
   const tx = transform ? transform.x / scale : 0
   const ty = transform ? transform.y / scale : 0
 
@@ -64,7 +50,7 @@ export default function DraggableBlock({ block, position, scale = 1, snapping = 
         transform: tx || ty ? `translate(${tx}px, ${ty}px)` : undefined,
         zIndex: isDragging ? 10 : 1,
         opacity: isDragging ? 0.85 : 1,
-        transition: isDragging ? 'none' : snapping ? 'left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)' : undefined,
+        transition: isDragging ? 'none' : undefined,
       }}
     >
       {showGlow && (
