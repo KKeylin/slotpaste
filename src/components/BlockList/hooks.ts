@@ -59,10 +59,21 @@ export function useCanvas(
   useEffect(() => {
     if (!containerRef.current) return
     const { width, height } = containerRef.current.getBoundingClientRect()
-    const initial = { x: width / 2 - CANVAS_W / 2, y: height / 2 - CANVAS_H / 2 }
-    panRef.current = initial
-    setPan(initial)
-    applyTransform(initial, 1)
+    if (home) {
+      const s = home.scale
+      const newPan = { x: width / 2 - home.x * s, y: height / 2 - home.y * s }
+      panRef.current = newPan
+      scaleRef.current = s
+      setPan(newPan)
+      setScale(s)
+      applyTransform(newPan, s)
+      setAtHome(true)
+    } else {
+      const initial = { x: width / 2 - CANVAS_W / 2, y: height / 2 - CANVAS_H / 2 }
+      panRef.current = initial
+      setPan(initial)
+      applyTransform(initial, 1)
+    }
   }, [])
 
   useEffect(() => {
