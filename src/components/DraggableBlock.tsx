@@ -15,9 +15,10 @@ interface Props {
   onDelete: (id: string) => void
   onResizeEnd?: (block: BlockType) => void
   readOnly?: boolean
+  isFlashing?: boolean
 }
 
-export default function DraggableBlock({ block, position, scale = 1, ...rest }: Props) {
+export default function DraggableBlock({ block, position, scale = 1, isFlashing, ...rest }: Props) {
   const [wiggling, setWiggling] = useState(false)
   const [showGlow, setShowGlow] = useState(true)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
@@ -66,6 +67,24 @@ export default function DraggableBlock({ block, position, scale = 1, ...rest }: 
             filter: 'blur(16px)',
             pointerEvents: 'none',
             zIndex: 0,
+          }}
+        />
+      )}
+
+      {isFlashing && (
+        <motion.div
+          key={`flash-${block.id}`}
+          initial={{ opacity: 1, scale: 1 }}
+          animate={{ opacity: 0, scale: 1.35 }}
+          transition={{ duration: 0.55, ease: 'easeOut' }}
+          style={{
+            position: 'absolute',
+            inset: -3,
+            borderRadius: 18,
+            border: '2px solid rgba(255,255,255,0.85)',
+            boxShadow: '0 0 16px rgba(255,255,255,0.35)',
+            pointerEvents: 'none',
+            zIndex: 2,
           }}
         />
       )}

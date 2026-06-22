@@ -40,7 +40,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
 
-  const { containerRef, canvasRef, pan, scale, scaleRef, atHome, goHome, setHome, resetZoom, pointerHandlers, touchHandlers } =
+  const { containerRef, canvasRef, pan, scale, scaleRef, atHome, flashBlockId, goHome, setHome, resetZoom, pointerHandlers, touchHandlers } =
     useCanvas(blocks, activeTabId, homePoint, onSetHome, focusBlockId, onFocusDone)
 
   const { handleDragEnd } =
@@ -82,6 +82,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
                 onColorChange={onColorChange}
                 onDelete={onDelete}
                 readOnly={readOnly}
+                isFlashing={block.id === flashBlockId}
               />
             ))}
 

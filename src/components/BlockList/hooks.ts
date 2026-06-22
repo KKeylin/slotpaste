@@ -16,6 +16,7 @@ export function useCanvas(
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [scale, setScale] = useState(1)
   const [atHome, setAtHome] = useState(false)
+  const [flashBlockId, setFlashBlockId] = useState<string | null>(null)
   const panRef = useRef({ x: 0, y: 0 })
   const scaleRef = useRef(1)
   const isPanning = useRef(false)
@@ -125,6 +126,12 @@ export function useCanvas(
   }, [activeTabId])
 
   useEffect(() => {
+    if (!flashBlockId) return
+    const t = setTimeout(() => setFlashBlockId(null), 650)
+    return () => clearTimeout(t)
+  }, [flashBlockId])
+
+  useEffect(() => {
     if (!focusBlockId) return
     const i = blocks.findIndex(b => b.id === focusBlockId)
     const block = blocks[i]
@@ -132,7 +139,11 @@ export function useCanvas(
     const pos = block.position ?? { x: CANVAS_W / 2, y: CANVAS_H / 2 + Math.max(0, i) * 90 }
     panToPoint(pos.x, pos.y, 1)
     setAtHome(false)
-    onFocusDone?.()
+    const t = setTimeout(() => {
+      setFlashBlockId(focusBlockId)
+      onFocusDone?.()
+    }, 418)
+    return () => clearTimeout(t)
   }, [focusBlockId])
 
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
@@ -261,6 +272,7 @@ export function useCanvas(
     scale,
     scaleRef,
     atHome,
+    flashBlockId,
     goHome,
     setHome,
     resetView,

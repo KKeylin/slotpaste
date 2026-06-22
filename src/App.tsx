@@ -20,7 +20,7 @@ import OnboardingModal from './components/OnboardingModal'
 import SecureModal from './components/SecureModal'
 import ImportConfirmModal from './components/ImportConfirmModal'
 import ResetModal from './components/ResetModal'
-import type { SearchBlock } from './components/SearchModal'
+import type { NavigateBlock } from './components/NavigateModal'
 import type { TabAppearance } from './types'
 import { isColorDark, hexToRgba } from './utils/color'
 import { resolveAppearance } from './utils/appearance'
@@ -58,7 +58,7 @@ export default function App() {
 
   const shortcuts: ShortcutMap = {
     focusAdd: state.preferences?.focusAddShortcut ?? DEFAULT_SHORTCUTS.focusAdd,
-    search:   state.preferences?.searchShortcut   ?? DEFAULT_SHORTCUTS.search,
+    navigate: state.preferences?.navigateShortcut ?? DEFAULT_SHORTCUTS.navigate,
     prevTab:  state.preferences?.prevTabShortcut  ?? DEFAULT_SHORTCUTS.prevTab,
     nextTab:  state.preferences?.nextTabShortcut  ?? DEFAULT_SHORTCUTS.nextTab,
     lock:     state.preferences?.lockShortcut     ?? DEFAULT_SHORTCUTS.lock,
@@ -88,7 +88,7 @@ export default function App() {
   function handleShortcutChange(key: keyof ShortcutMap, value: ShortcutMap[keyof ShortcutMap]) {
     const prefKey: Record<keyof ShortcutMap, string> = {
       focusAdd: 'focusAddShortcut',
-      search:   'searchShortcut',
+      navigate: 'navigateShortcut',
       prevTab:  'prevTabShortcut',
       nextTab:  'nextTabShortcut',
       lock:     'lockShortcut',
@@ -130,7 +130,7 @@ export default function App() {
     [activeTab?.blocks, secureMode.isLocked, secureMode.decryptedTexts]
   )
 
-  const searchBlocks = useMemo<SearchBlock[]>(
+  const navigateBlocks = useMemo<NavigateBlock[]>(
     () => state.tabs.flatMap(tab =>
       tab.blocks.map(b => ({
         id: b.id,
@@ -147,7 +147,7 @@ export default function App() {
 
   const [focusBlockId, setFocusBlockId] = useState<string | null>(null)
 
-  function handleSearchSelect(block: SearchBlock) {
+  function handleNavigate(block: NavigateBlock) {
     copy(block.text)
     if (block.tabId !== state.activeTabId) {
       patchState({ activeTabId: block.tabId })
@@ -177,8 +177,8 @@ export default function App() {
       activeTabId={state.activeTabId}
       appearance={tabAppearance}
       btnStyle={btnStyle}
-      searchBlocks={searchBlocks}
-      searchShortcut={shortcuts.search}
+      navigateBlocks={navigateBlocks}
+      navigateShortcut={shortcuts.navigate}
       isSecureEnabled={isSecureEnabled}
       isSecureLocked={secureMode.isLocked}
       helpOpen={helpOpen}
@@ -188,7 +188,7 @@ export default function App() {
       onRenameTab={renameTab}
       onReorderTabs={reorderTabs}
       onDeleteTab={deleteTab}
-      onSelect={handleSearchSelect}
+      onSelect={handleNavigate}
       onOpenHelp={() => setHelpOpen(true)}
       onToggleSettings={() => setSettingsOpen((v) => !v)}
       onToggleLock={() => secureMode.isLocked ? secureOps.open(SECURE_INTENT.UNLOCK) : secureMode.lock()}

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import type { KeyShortcut } from '../types'
 
 export const DEFAULT_FOCUS_ADD_SHORTCUT: KeyShortcut = { key: 'KeyN', alt: true, ctrl: false, meta: false, shift: false }
-export const DEFAULT_SEARCH_SHORTCUT: KeyShortcut    = { key: 'KeyF', alt: true, ctrl: false, meta: false, shift: false }
+export const DEFAULT_NAVIGATE_SHORTCUT: KeyShortcut    = { key: 'KeyF', alt: true, ctrl: false, meta: false, shift: false }
 export const DEFAULT_PREV_TAB_SHORTCUT: KeyShortcut  = { key: 'ArrowLeft', alt: true, ctrl: false, meta: false, shift: false }
 export const DEFAULT_NEXT_TAB_SHORTCUT: KeyShortcut  = { key: 'ArrowRight', alt: true, ctrl: false, meta: false, shift: false }
 export const DEFAULT_LOCK_SHORTCUT: KeyShortcut      = { key: 'KeyL', alt: true, ctrl: false, meta: false, shift: false }
@@ -43,7 +43,7 @@ function matchesShortcut(e: KeyboardEvent, s: KeyShortcut): boolean {
 
 export interface ShortcutMap {
   focusAdd: KeyShortcut
-  search: KeyShortcut
+  navigate: KeyShortcut
   prevTab: KeyShortcut
   nextTab: KeyShortcut
   lock: KeyShortcut
@@ -51,7 +51,7 @@ export interface ShortcutMap {
 
 export const DEFAULT_SHORTCUTS: ShortcutMap = {
   focusAdd: DEFAULT_FOCUS_ADD_SHORTCUT,
-  search:   DEFAULT_SEARCH_SHORTCUT,
+  navigate: DEFAULT_NAVIGATE_SHORTCUT,
   prevTab:  DEFAULT_PREV_TAB_SHORTCUT,
   nextTab:  DEFAULT_NEXT_TAB_SHORTCUT,
   lock:     DEFAULT_LOCK_SHORTCUT,

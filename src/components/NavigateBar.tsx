@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import type { SearchBlock } from './SearchModal'
+import type { NavigateBlock } from './NavigateModal'
 import type { KeyShortcut } from '../types'
 
 interface Props {
-  blocks: SearchBlock[]
-  onSelect: (block: SearchBlock) => void
+  blocks: NavigateBlock[]
+  onSelect: (block: NavigateBlock) => void
   buttonStyle?: React.CSSProperties
   shortcut?: KeyShortcut
 }
@@ -22,7 +22,7 @@ function highlight(text: string, query: string) {
   )
 }
 
-export default function SearchBar({ blocks, onSelect, buttonStyle, shortcut }: Props) {
+export default function NavigateBar({ blocks, onSelect, buttonStyle, shortcut }: Props) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState(0)
@@ -68,7 +68,7 @@ export default function SearchBar({ blocks, onSelect, buttonStyle, shortcut }: P
     setQuery('')
   }
 
-  function handleSelect(block: SearchBlock) {
+  function handleSelect(block: NavigateBlock) {
     onSelect(block)
     close()
     inputRef.current?.blur()
@@ -103,7 +103,11 @@ export default function SearchBar({ blocks, onSelect, buttonStyle, shortcut }: P
         }}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ color: iconColor, flexShrink: 0, opacity: 0.6 }}>
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          <circle cx="12" cy="12" r="7"/>
+          <line x1="12" y1="2" x2="12" y2="6"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="6" y2="12"/>
+          <line x1="18" y1="12" x2="22" y2="12"/>
         </svg>
         <input
           ref={inputRef}
@@ -111,7 +115,7 @@ export default function SearchBar({ blocks, onSelect, buttonStyle, shortcut }: P
           onChange={e => { setQuery(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Search…"
+          placeholder="Navigate…"
           className="flex-1 bg-transparent text-[11px] outline-none min-w-0"
           style={{ color: iconColor, caretColor: '#1D9E75' }}
         />
