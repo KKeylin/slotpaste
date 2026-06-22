@@ -5,7 +5,7 @@ import type { KeyShortcut } from '../types'
 
 interface Props {
   blocks: SearchBlock[]
-  onCopy: (text: string) => void
+  onSelect: (block: SearchBlock) => void
   buttonStyle?: React.CSSProperties
   shortcut?: KeyShortcut
 }
@@ -22,7 +22,7 @@ function highlight(text: string, query: string) {
   )
 }
 
-export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Props) {
+export default function SearchBar({ blocks, onSelect, buttonStyle, shortcut }: Props) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState(0)
@@ -68,8 +68,8 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
     setQuery('')
   }
 
-  function handleCopy(block: SearchBlock) {
-    onCopy(block.text)
+  function handleSelect(block: SearchBlock) {
+    onSelect(block)
     close()
     inputRef.current?.blur()
   }
@@ -78,7 +78,7 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
     if (e.key === 'Escape') { close(); inputRef.current?.blur(); return }
     if (e.key === 'ArrowDown') { e.preventDefault(); setSelected(s => Math.min(s + 1, results.length - 1)) }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setSelected(s => Math.max(s - 1, 0)) }
-    else if (e.key === 'Enter' && results[selected]) handleCopy(results[selected])
+    else if (e.key === 'Enter' && results[selected]) handleSelect(results[selected])
   }
 
   const showDropdown = open && query.trim().length > 0
@@ -127,6 +127,7 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
       {showDropdown && dropRect && createPortal(
         <div
           className="overflow-y-auto [&::-webkit-scrollbar]:hidden"
+          onPointerDown={e => e.stopPropagation()}
           style={{
             position: 'fixed',
             top: dropRect.bottom + 4,
@@ -144,7 +145,7 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
           {results.length > 0 ? results.map((block, i) => (
             <div
               key={block.id}
-              onClick={() => handleCopy(block)}
+              onClick={() => handleSelect(block)}
               onMouseEnter={() => setSelected(i)}
               className="flex flex-col gap-1 px-3 py-2.5 cursor-pointer"
               style={{

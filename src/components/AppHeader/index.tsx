@@ -20,7 +20,7 @@ interface Props {
   onRenameTab: (id: string, name: string) => void
   onReorderTabs: (tabs: Tab[]) => void
   onDeleteTab: (id: string) => void
-  onCopy: (text: string) => void
+  onSelect: (block: SearchBlock) => void
   onOpenHelp: () => void
   onToggleSettings: () => void
   onToggleLock: () => void
@@ -30,7 +30,7 @@ export default function AppHeader({
   tabs, activeTabId, appearance, btnStyle, searchBlocks, searchShortcut,
   isSecureEnabled, isSecureLocked, helpOpen, settingsOpen,
   onSelectTab, onAddTab, onRenameTab, onReorderTabs, onDeleteTab,
-  onCopy, onOpenHelp, onToggleSettings, onToggleLock,
+  onSelect, onOpenHelp, onToggleSettings, onToggleLock,
 }: Props) {
   return (
     <div className="relative">
@@ -46,7 +46,7 @@ export default function AppHeader({
         onDelete={onDeleteTab}
       />
       <div className="absolute top-0 right-0 flex items-center">
-        <SearchBar blocks={searchBlocks} onCopy={onCopy} buttonStyle={btnStyle} shortcut={searchShortcut} />
+        <SearchBar blocks={searchBlocks} onSelect={onSelect} buttonStyle={btnStyle} shortcut={searchShortcut} />
         {isSecureEnabled && (
           <button
             onClick={onToggleLock}

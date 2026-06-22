@@ -6,11 +6,14 @@ export interface SearchBlock {
   id: string
   text: string
   tabName: string
+  tabId: string
+  position?: { x: number; y: number }
+  viewMode: 'list' | 'canvas'
 }
 
 interface Props {
   blocks: SearchBlock[]
-  onCopy: (text: string) => void
+  onSelect: (block: SearchBlock) => void
   onClose: () => void
 }
 
@@ -26,7 +29,7 @@ function highlight(text: string, query: string) {
   ))
 }
 
-export default function SearchModal({ blocks, onCopy, onClose }: Props) {
+export default function SearchModal({ blocks, onSelect, onClose }: Props) {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -45,8 +48,8 @@ export default function SearchModal({ blocks, onCopy, onClose }: Props) {
     el?.scrollIntoView({ block: 'nearest' })
   }, [selected])
 
-  function handleCopy(block: SearchBlock) {
-    onCopy(block.text)
+  function handleSelect(block: SearchBlock) {
+    onSelect(block)
     onClose()
   }
 
@@ -54,7 +57,7 @@ export default function SearchModal({ blocks, onCopy, onClose }: Props) {
     if (e.key === 'Escape') { onClose(); return }
     if (e.key === 'ArrowDown') { e.preventDefault(); setSelected(s => Math.min(s + 1, results.length - 1)) }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setSelected(s => Math.max(s - 1, 0)) }
-    else if (e.key === 'Enter' && results[selected]) handleCopy(results[selected])
+    else if (e.key === 'Enter' && results[selected]) handleSelect(results[selected])
   }
 
   return createPortal(
@@ -107,7 +110,7 @@ export default function SearchModal({ blocks, onCopy, onClose }: Props) {
             {results.map((block, i) => (
               <div
                 key={block.id}
-                onClick={() => handleCopy(block)}
+                onClick={() => handleSelect(block)}
                 onMouseEnter={() => setSelected(i)}
                 className="flex flex-col gap-1 px-4 py-2.5 cursor-pointer"
                 style={{
@@ -135,7 +138,7 @@ export default function SearchModal({ blocks, onCopy, onClose }: Props) {
 
         <div className="flex items-center gap-3 px-4 py-2" style={{ borderTop: results.length > 0 || query.trim() ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
           <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>↑↓ navigate</span>
-          <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>↵ copy</span>
+          <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>↵ navigate</span>
           <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>Esc close</span>
         </div>
       </motion.div>

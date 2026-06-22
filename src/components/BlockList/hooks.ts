@@ -8,6 +8,8 @@ export function useCanvas(
   activeTabId: string,
   home: { x: number; y: number; scale: number } | undefined,
   onSetHome: (point: { x: number; y: number; scale: number }) => void,
+  focusBlockId?: string | null,
+  onFocusDone?: () => void,
 ) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
@@ -83,7 +85,7 @@ export function useCanvas(
       e.preventDefault()
       setAtHome(false)
       const factor = 1 - e.deltaY * 0.001
-      const newScale = Math.min(3, Math.max(0.15, scaleRef.current * factor))
+      const newScale = Math.min(3, Math.max(0.5, scaleRef.current * factor))
       const rect = el!.getBoundingClientRect()
       const cx = e.clientX - rect.left
       const cy = e.clientY - rect.top
@@ -114,12 +116,24 @@ export function useCanvas(
   const isFirstRender = useRef(true)
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
+    if (focusBlockId) return
     if (home) {
       panToPoint(home.x, home.y, home.scale)
     } else {
       resetView()
     }
   }, [activeTabId])
+
+  useEffect(() => {
+    if (!focusBlockId) return
+    const i = blocks.findIndex(b => b.id === focusBlockId)
+    const block = blocks[i]
+    if (!block) { onFocusDone?.(); return }
+    const pos = block.position ?? { x: CANVAS_W / 2, y: CANVAS_H / 2 + Math.max(0, i) * 90 }
+    panToPoint(pos.x, pos.y, 1)
+    setAtHome(false)
+    onFocusDone?.()
+  }, [focusBlockId])
 
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (e.target !== e.currentTarget) return
@@ -170,7 +184,7 @@ export function useCanvas(
     const t1 = e.touches[0], t2 = e.touches[1]
     const newDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
     const factor = newDist / pinchStartDist.current
-    const newScale = Math.min(3, Math.max(0.15, scaleRef.current * factor))
+    const newScale = Math.min(3, Math.max(0.5, scaleRef.current * factor))
     const rect = containerRef.current!.getBoundingClientRect()
     const cx = (t1.clientX + t2.clientX) / 2 - rect.left
     const cy = (t1.clientY + t2.clientY) / 2 - rect.top

@@ -132,11 +132,30 @@ export default function App() {
 
   const searchBlocks = useMemo<SearchBlock[]>(
     () => state.tabs.flatMap(tab =>
-      tab.blocks.map(b => ({ id: b.id, text: secureMode.getDisplayText(b.id, b.text), tabName: tab.name }))
+      tab.blocks.map(b => ({
+        id: b.id,
+        text: secureMode.getDisplayText(b.id, b.text),
+        tabName: tab.name,
+        tabId: tab.id,
+        position: b.position,
+        viewMode: tab.viewMode,
+      }))
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.tabs, secureMode.isLocked, secureMode.decryptedTexts]
   )
+
+  const [focusBlockId, setFocusBlockId] = useState<string | null>(null)
+
+  function handleSearchSelect(block: SearchBlock) {
+    copy(block.text)
+    if (block.tabId !== state.activeTabId) {
+      patchState({ activeTabId: block.tabId })
+    }
+    if (block.viewMode === 'canvas') {
+      setFocusBlockId(block.id)
+    }
+  }
 
   if (!ready) return null
 
@@ -169,7 +188,7 @@ export default function App() {
       onRenameTab={renameTab}
       onReorderTabs={reorderTabs}
       onDeleteTab={deleteTab}
-      onCopy={copy}
+      onSelect={handleSearchSelect}
       onOpenHelp={() => setHelpOpen(true)}
       onToggleSettings={() => setSettingsOpen((v) => !v)}
       onToggleLock={() => secureMode.isLocked ? secureOps.open(SECURE_INTENT.UNLOCK) : secureMode.lock()}
@@ -214,6 +233,8 @@ export default function App() {
             homePoint={activeTab.home}
             onSetHome={(point) => patchTab(activeTab.id, { home: point })}
             onHomeSet={() => showToast('', 'Home point saved')}
+            focusBlockId={focusBlockId}
+            onFocusDone={() => setFocusBlockId(null)}
           />
           <div className="absolute top-0 inset-x-0 z-10 pointer-events-none">
             <div className="pointer-events-auto" style={blurStyle}>
