@@ -20,7 +20,7 @@ import OnboardingModal from './components/OnboardingModal'
 import SecureModal from './components/SecureModal'
 import ImportConfirmModal from './components/ImportConfirmModal'
 import ResetModal from './components/ResetModal'
-import type { SearchBlock } from './components/SearchModal'
+import type { NavigateBlock } from './components/NavigateModal'
 import type { TabAppearance } from './types'
 import { isColorDark, hexToRgba } from './utils/color'
 import { resolveAppearance } from './utils/appearance'
@@ -58,7 +58,7 @@ export default function App() {
 
   const shortcuts: ShortcutMap = {
     focusAdd: state.preferences?.focusAddShortcut ?? DEFAULT_SHORTCUTS.focusAdd,
-    search:   state.preferences?.searchShortcut   ?? DEFAULT_SHORTCUTS.search,
+    navigate: state.preferences?.navigateShortcut ?? DEFAULT_SHORTCUTS.navigate,
     prevTab:  state.preferences?.prevTabShortcut  ?? DEFAULT_SHORTCUTS.prevTab,
     nextTab:  state.preferences?.nextTabShortcut  ?? DEFAULT_SHORTCUTS.nextTab,
     lock:     state.preferences?.lockShortcut     ?? DEFAULT_SHORTCUTS.lock,
@@ -88,7 +88,7 @@ export default function App() {
   function handleShortcutChange(key: keyof ShortcutMap, value: ShortcutMap[keyof ShortcutMap]) {
     const prefKey: Record<keyof ShortcutMap, string> = {
       focusAdd: 'focusAddShortcut',
-      search:   'searchShortcut',
+      navigate: 'navigateShortcut',
       prevTab:  'prevTabShortcut',
       nextTab:  'nextTabShortcut',
       lock:     'lockShortcut',
@@ -130,13 +130,32 @@ export default function App() {
     [activeTab?.blocks, secureMode.isLocked, secureMode.decryptedTexts]
   )
 
-  const searchBlocks = useMemo<SearchBlock[]>(
+  const navigateBlocks = useMemo<NavigateBlock[]>(
     () => state.tabs.flatMap(tab =>
-      tab.blocks.map(b => ({ id: b.id, text: secureMode.getDisplayText(b.id, b.text), tabName: tab.name }))
+      tab.blocks.map(b => ({
+        id: b.id,
+        text: secureMode.getDisplayText(b.id, b.text),
+        tabName: tab.name,
+        tabId: tab.id,
+        position: b.position,
+        viewMode: tab.viewMode,
+      }))
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [state.tabs, secureMode.isLocked, secureMode.decryptedTexts]
   )
+
+  const [focusBlockId, setFocusBlockId] = useState<string | null>(null)
+
+  function handleNavigate(block: NavigateBlock) {
+    copy(block.text)
+    if (block.tabId !== state.activeTabId) {
+      patchState({ activeTabId: block.tabId })
+    }
+    if (block.viewMode === 'canvas') {
+      setFocusBlockId(block.id)
+    }
+  }
 
   if (!ready) return null
 
@@ -158,8 +177,8 @@ export default function App() {
       activeTabId={state.activeTabId}
       appearance={tabAppearance}
       btnStyle={btnStyle}
-      searchBlocks={searchBlocks}
-      searchShortcut={shortcuts.search}
+      navigateBlocks={navigateBlocks}
+      navigateShortcut={shortcuts.navigate}
       isSecureEnabled={isSecureEnabled}
       isSecureLocked={secureMode.isLocked}
       helpOpen={helpOpen}
@@ -169,7 +188,7 @@ export default function App() {
       onRenameTab={renameTab}
       onReorderTabs={reorderTabs}
       onDeleteTab={deleteTab}
-      onCopy={copy}
+      onSelect={handleNavigate}
       onOpenHelp={() => setHelpOpen(true)}
       onToggleSettings={() => setSettingsOpen((v) => !v)}
       onToggleLock={() => secureMode.isLocked ? secureOps.open(SECURE_INTENT.UNLOCK) : secureMode.lock()}
@@ -214,6 +233,8 @@ export default function App() {
             homePoint={activeTab.home}
             onSetHome={(point) => patchTab(activeTab.id, { home: point })}
             onHomeSet={() => showToast('', 'Home point saved')}
+            focusBlockId={focusBlockId}
+            onFocusDone={() => setFocusBlockId(null)}
           />
           <div className="absolute top-0 inset-x-0 z-10 pointer-events-none">
             <div className="pointer-events-auto" style={blurStyle}>

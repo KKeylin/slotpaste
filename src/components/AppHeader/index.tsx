@@ -1,16 +1,16 @@
 import TabBar from '../TabBar'
-import SearchBar from '../SearchBar'
+import NavigateBar from '../NavigateBar'
 import { LockIcon, HelpIcon, SettingsIcon } from '../icons'
 import type { Appearance, Tab, KeyShortcut } from '../../types'
-import type { SearchBlock } from '../SearchModal'
+import type { NavigateBlock } from '../NavigateModal'
 
 interface Props {
   tabs: Tab[]
   activeTabId: string
   appearance: Appearance
   btnStyle: React.CSSProperties
-  searchBlocks: SearchBlock[]
-  searchShortcut: KeyShortcut
+  navigateBlocks: NavigateBlock[]
+  navigateShortcut: KeyShortcut
   isSecureEnabled: boolean
   isSecureLocked: boolean
   helpOpen: boolean
@@ -20,17 +20,17 @@ interface Props {
   onRenameTab: (id: string, name: string) => void
   onReorderTabs: (tabs: Tab[]) => void
   onDeleteTab: (id: string) => void
-  onCopy: (text: string) => void
+  onSelect: (block: NavigateBlock) => void
   onOpenHelp: () => void
   onToggleSettings: () => void
   onToggleLock: () => void
 }
 
 export default function AppHeader({
-  tabs, activeTabId, appearance, btnStyle, searchBlocks, searchShortcut,
+  tabs, activeTabId, appearance, btnStyle, navigateBlocks, navigateShortcut,
   isSecureEnabled, isSecureLocked, helpOpen, settingsOpen,
   onSelectTab, onAddTab, onRenameTab, onReorderTabs, onDeleteTab,
-  onCopy, onOpenHelp, onToggleSettings, onToggleLock,
+  onSelect, onOpenHelp, onToggleSettings, onToggleLock,
 }: Props) {
   return (
     <div className="relative">
@@ -46,7 +46,7 @@ export default function AppHeader({
         onDelete={onDeleteTab}
       />
       <div className="absolute top-0 right-0 flex items-center">
-        <SearchBar blocks={searchBlocks} onCopy={onCopy} buttonStyle={btnStyle} shortcut={searchShortcut} />
+        <NavigateBar blocks={navigateBlocks} onSelect={onSelect} buttonStyle={btnStyle} shortcut={navigateShortcut} />
         {isSecureEnabled && (
           <button
             onClick={onToggleLock}

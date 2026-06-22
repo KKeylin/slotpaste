@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import type { SearchBlock } from './SearchModal'
+import type { NavigateBlock } from './NavigateModal'
 import type { KeyShortcut } from '../types'
 
 interface Props {
-  blocks: SearchBlock[]
-  onCopy: (text: string) => void
+  blocks: NavigateBlock[]
+  onSelect: (block: NavigateBlock) => void
   buttonStyle?: React.CSSProperties
   shortcut?: KeyShortcut
 }
@@ -22,7 +22,7 @@ function highlight(text: string, query: string) {
   )
 }
 
-export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Props) {
+export default function NavigateBar({ blocks, onSelect, buttonStyle, shortcut }: Props) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState(0)
@@ -68,8 +68,8 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
     setQuery('')
   }
 
-  function handleCopy(block: SearchBlock) {
-    onCopy(block.text)
+  function handleSelect(block: NavigateBlock) {
+    onSelect(block)
     close()
     inputRef.current?.blur()
   }
@@ -78,7 +78,7 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
     if (e.key === 'Escape') { close(); inputRef.current?.blur(); return }
     if (e.key === 'ArrowDown') { e.preventDefault(); setSelected(s => Math.min(s + 1, results.length - 1)) }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setSelected(s => Math.max(s - 1, 0)) }
-    else if (e.key === 'Enter' && results[selected]) handleCopy(results[selected])
+    else if (e.key === 'Enter' && results[selected]) handleSelect(results[selected])
   }
 
   const showDropdown = open && query.trim().length > 0
@@ -103,7 +103,11 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
         }}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ color: iconColor, flexShrink: 0, opacity: 0.6 }}>
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          <circle cx="12" cy="12" r="7"/>
+          <line x1="12" y1="2" x2="12" y2="6"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="6" y2="12"/>
+          <line x1="18" y1="12" x2="22" y2="12"/>
         </svg>
         <input
           ref={inputRef}
@@ -111,7 +115,7 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
           onChange={e => { setQuery(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Search…"
+          placeholder="Navigate…"
           className="flex-1 bg-transparent text-[11px] outline-none min-w-0"
           style={{ color: iconColor, caretColor: '#1D9E75' }}
         />
@@ -127,6 +131,7 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
       {showDropdown && dropRect && createPortal(
         <div
           className="overflow-y-auto [&::-webkit-scrollbar]:hidden"
+          onPointerDown={e => e.stopPropagation()}
           style={{
             position: 'fixed',
             top: dropRect.bottom + 4,
@@ -144,7 +149,7 @@ export default function SearchBar({ blocks, onCopy, buttonStyle, shortcut }: Pro
           {results.length > 0 ? results.map((block, i) => (
             <div
               key={block.id}
-              onClick={() => handleCopy(block)}
+              onClick={() => handleSelect(block)}
               onMouseEnter={() => setSelected(i)}
               className="flex flex-col gap-1 px-3 py-2.5 cursor-pointer"
               style={{

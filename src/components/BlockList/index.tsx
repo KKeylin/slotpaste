@@ -19,6 +19,8 @@ interface Props {
   homePoint?: { x: number; y: number; scale: number }
   onSetHome: (point: { x: number; y: number; scale: number }) => void
   onHomeSet?: () => void
+  focusBlockId?: string | null
+  onFocusDone?: () => void
 }
 
 const CANVAS_GRID_SIZE = 32
@@ -32,14 +34,14 @@ function gridBackground(appearance: Props['appearance'], isDark: boolean): strin
   return `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`
 }
 
-export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly, homePoint, onSetHome, onHomeSet }: Props) {
+export default function BlockList({ blocks, activeTabId, appearance, onCopy, onAdd, onChange, onColorChange, onDelete, readOnly, homePoint, onSetHome, onHomeSet, focusBlockId, onFocusDone }: Props) {
   const isDark = isColorDark(appearance.bgColor)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   )
 
-  const { containerRef, canvasRef, pan, scale, scaleRef, atHome, goHome, setHome, resetZoom, pointerHandlers, touchHandlers } =
-    useCanvas(blocks, activeTabId, homePoint, onSetHome)
+  const { containerRef, canvasRef, pan, scale, scaleRef, atHome, flashBlockId, goHome, setHome, resetZoom, pointerHandlers, touchHandlers } =
+    useCanvas(blocks, activeTabId, homePoint, onSetHome, focusBlockId, onFocusDone)
 
   const { handleDragEnd } =
     useBlockSnap(blocks, onChange, scaleRef)
@@ -80,6 +82,7 @@ export default function BlockList({ blocks, activeTabId, appearance, onCopy, onA
                 onColorChange={onColorChange}
                 onDelete={onDelete}
                 readOnly={readOnly}
+                isFlashing={block.id === flashBlockId}
               />
             ))}
 

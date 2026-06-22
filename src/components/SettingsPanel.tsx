@@ -249,7 +249,7 @@ export default function SettingsPanel({ isOpen, appearance, secureEnabled, secur
             </span>
             {(Object.entries({
               focusAdd: 'Focus add',
-              search:   'Search',
+              navigate: 'Navigate',
               prevTab:  'Previous tab',
               nextTab:  'Next tab',
               lock:     'Lock / Unlock',
